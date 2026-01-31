@@ -29,17 +29,17 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
 
     if (contentRef.current) {
       tl.to(contentRef.current, {
-        scale: 0.9,
-        y: 20,
+        scale: 0.95,
+        y: 30,
         opacity: 0,
-        duration: 0.2,
-        ease: 'power2.in',
+        duration: 0.25,
+        ease: 'power3.in',
       }, 0);
     }
     if (overlayRef.current) {
       tl.to(overlayRef.current, {
         opacity: 0,
-        duration: 0.2,
+        duration: 0.25,
         ease: 'power2.in',
       }, 0);
     }
@@ -57,17 +57,16 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
       document.body.style.overflow = 'hidden';
       isVisible.current = true;
 
-      // GSAP open animation
       if (overlayRef.current && contentRef.current) {
         gsap.fromTo(
           overlayRef.current,
           { opacity: 0 },
-          { opacity: 1, duration: 0.2, ease: 'power2.out' }
+          { opacity: 1, duration: 0.3, ease: 'power2.out' }
         );
         gsap.fromTo(
           contentRef.current,
-          { scale: 0.9, y: 20, opacity: 0 },
-          { scale: 1, y: 0, opacity: 1, duration: 0.3, ease: 'back.out(1.4)' }
+          { scale: 0.95, y: 30, opacity: 0 },
+          { scale: 1, y: 0, opacity: 1, duration: 0.4, ease: 'back.out(1.2)' }
         );
       }
     }
@@ -94,15 +93,15 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"
     >
       <div
         ref={contentRef}
-        className="relative w-full max-w-lg rounded-xl bg-white shadow-2xl"
+        className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-cream shadow-2xl"
       >
         <button
           onClick={handleCloseClick}
-          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white transition-colors hover:bg-black/60"
+          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-ink/50 text-sm text-white backdrop-blur-sm transition-colors hover:bg-ink/70"
           aria-label="Close"
         >
           &#10005;

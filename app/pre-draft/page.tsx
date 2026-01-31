@@ -13,7 +13,6 @@ export default function PreDraftPage() {
   const eliminatedCount = chefs.filter((c) => c.status === 'eliminated').length;
   const remainingCount = chefs.length - eliminatedCount;
 
-  // Count how many were eliminated in the current episode
   const eliminatedThisEpisode = chefs.filter(
     (c) => c.eliminatedEpisode === currentEpisode
   ).length;
@@ -35,31 +34,37 @@ export default function PreDraftPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Pre-Draft Eliminations
-          </h1>
-          <p className="mt-1 text-lg text-gray-500">
-            Episode {currentEpisode} of 3
-          </p>
-          <p className="mt-1 text-sm text-gray-400">
-            {eliminatedCount} eliminated &middot; {remainingCount} remaining
-          </p>
+    <div className="min-h-screen bg-cream">
+      {/* Dark header */}
+      <div className="bg-ink px-4 py-12 text-center">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+          Episode {currentEpisode} of 3
+        </p>
+        <h1 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
+          Pre-Draft Eliminations
+        </h1>
+        <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+          <span className="text-danger">
+            <span className="font-mono font-bold">{eliminatedCount}</span> eliminated
+          </span>
+          <span className="h-4 w-px bg-white/20" />
+          <span className="text-success">
+            <span className="font-mono font-bold">{remainingCount}</span> remaining
+          </span>
         </div>
+      </div>
 
+      <div className="mx-auto max-w-6xl px-4 py-10">
         {/* Actions */}
-        <div className="mb-6 flex justify-center gap-3">
+        <div className="mb-8 flex justify-center gap-3">
           {currentEpisode < 3 && (
             <button
               onClick={advanceEpisode}
               disabled={!canAdvance}
-              className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+              className={`rounded-lg px-6 py-2.5 text-sm font-bold uppercase tracking-wider transition-all ${
                 canAdvance
-                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  : 'cursor-not-allowed bg-gray-100 text-gray-400'
+                  ? 'bg-white text-charcoal shadow-md hover:shadow-lg'
+                  : 'cursor-not-allowed bg-stone-light text-warm-gray'
               }`}
             >
               Advance to Episode {currentEpisode + 1}
@@ -69,10 +74,10 @@ export default function PreDraftPage() {
             <button
               onClick={handleStartDraft}
               disabled={!canStartDraft}
-              className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+              className={`rounded-lg px-6 py-2.5 text-sm font-bold uppercase tracking-wider transition-all ${
                 canStartDraft
-                  ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'cursor-not-allowed bg-gray-200 text-gray-400'
+                  ? 'bg-ink text-white shadow-lg hover:bg-charcoal hover:shadow-xl'
+                  : 'cursor-not-allowed bg-stone-light text-warm-gray'
               }`}
             >
               Start Draft
@@ -80,8 +85,12 @@ export default function PreDraftPage() {
           )}
         </div>
 
-        {/* Chef Grid — using ChefCard component */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:grid-cols-6">
+        <p className="mb-6 text-center text-xs text-warm-gray">
+          Tap an active chef to eliminate. Tap an eliminated chef to restore.
+        </p>
+
+        {/* Chef Grid */}
+        <div className="grid grid-cols-3 gap-3 sm:gap-5 lg:grid-cols-6">
           {chefs.map((chef) => (
             <ChefCard
               key={chef.id}

@@ -17,19 +17,26 @@ export default function DraftPage() {
 
   if (phase !== 'draft' && phase !== 'season') {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-gray-500">Redirecting to pre-draft...</p>
+      <div className="flex min-h-screen items-center justify-center bg-cream">
+        <p className="text-warm-gray">Redirecting to pre-draft...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Fantasy Draft</h1>
-          <p className="mt-1 text-lg text-gray-500">Snake Draft — 14 Picks + 1 Wildcard</p>
-        </div>
+    <div className="min-h-screen bg-cream">
+      {/* Header */}
+      <div className="bg-ink px-4 py-12 text-center">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+          Snake Draft
+        </p>
+        <h1 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
+          Fantasy Draft
+        </h1>
+        <p className="mt-2 text-sm text-white/50">14 Picks + 1 Wildcard</p>
+      </div>
+
+      <div className="mx-auto max-w-4xl px-4 py-10">
         <DraftBoard />
       </div>
     </div>

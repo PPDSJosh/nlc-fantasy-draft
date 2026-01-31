@@ -24,7 +24,6 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
 
   const existingEpisode = episodes.find((e) => e.episodeNumber === episodeNumber);
 
-  // Check if predictions are locked for this episode
   const joshPrediction = predictions.find(
     (p) => p.episodeNumber === episodeNumber && p.player === 'josh'
   );
@@ -32,12 +31,10 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
     (p) => p.episodeNumber === episodeNumber && p.player === 'wife'
   );
 
-  // Derive prediction completion from store state (no stale closure)
   const bothPredictionsLocked =
     (joshPrediction?.locked && wifePrediction?.locked) || !!existingEpisode?.scored;
 
   function handleSave(results: EpisodeResult[]) {
-    // Resolve predictions based on results
     const survivedChefIds = results
       .filter((r) => r.survived && !r.eliminated)
       .map((r) => r.chefId);
@@ -49,21 +46,26 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-3xl px-4 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Episode {episodeNumber}</h1>
-          <p className="mt-1 text-lg text-gray-500">Score Results</p>
-          <p className="mt-1 text-sm text-gray-400">
-            {activeChefs.length} chefs competing
-          </p>
-        </div>
+    <div className="min-h-screen bg-cream">
+      {/* Header */}
+      <div className="bg-ink px-4 py-12 text-center">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+          Score Results
+        </p>
+        <h1 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
+          Episode {episodeNumber}
+        </h1>
+        <p className="mt-2 text-sm text-white/50">
+          {activeChefs.length} chefs competing
+        </p>
+      </div>
 
-        {/* Prediction Phase — shown before scoring */}
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        {/* Prediction Phase */}
         {!bothPredictionsLocked && (
           <div className="mb-8">
-            <h2 className="mb-4 text-lg font-bold text-gray-900">Predictions</h2>
-            <p className="mb-4 text-sm text-gray-500">
+            <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-warm-gray">Predictions</h2>
+            <p className="mb-4 text-xs text-warm-gray">
               Each player: predict which of your chefs will survive. +3 if correct, -2 if wrong, 0 if skipped.
             </p>
             <div className="flex flex-col gap-4">
@@ -81,10 +83,9 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
           </div>
         )}
 
-        {/* Scoring Form — shown after predictions locked */}
+        {/* Scoring Form */}
         {bothPredictionsLocked && (
           <>
-            {/* Show locked predictions summary */}
             {(joshPrediction || wifePrediction) && (
               <div className="mb-6 flex flex-col gap-2">
                 <PredictionPanel

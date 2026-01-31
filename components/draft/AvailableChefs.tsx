@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Chef } from '@/lib/data/chefs';
 import gsap from 'gsap';
 import { Draggable } from 'gsap/dist/Draggable';
@@ -10,9 +11,9 @@ if (typeof window !== 'undefined') {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  pro: '#3A5BA0',
-  social: '#9B4A8C',
-  home: '#5A8A4A',
+  pro: 'bg-pro',
+  social: 'bg-social',
+  home: 'bg-home',
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -45,20 +46,19 @@ function DraftableChef({
   const setupDraggable = useCallback(() => {
     if (!btnRef.current || disabled) return;
 
-    // Kill any existing draggable instances
     draggableRef.current.forEach((d) => d.kill());
 
     draggableRef.current = Draggable.create(btnRef.current, {
       type: 'x,y',
       zIndexBoost: true,
       onDragStart() {
-        gsap.to(btnRef.current, { scale: 1.1, boxShadow: '0 8px 25px rgba(0,0,0,0.2)', duration: 0.15 });
+        gsap.to(btnRef.current, { scale: 1.1, boxShadow: '0 12px 30px rgba(0,0,0,0.2)', duration: 0.15 });
       },
       onDrag() {
         const dropTarget = getDropTarget();
         if (!dropTarget || !btnRef.current) return;
         if (this.hitTest(dropTarget, '20%')) {
-          gsap.to(dropTarget, { borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.05)', duration: 0.15, overwrite: true });
+          gsap.to(dropTarget, { borderColor: 'var(--gold)', backgroundColor: 'var(--gold-light)', duration: 0.15, overwrite: true });
         } else {
           gsap.to(dropTarget, { borderColor: '', backgroundColor: '', duration: 0.15, overwrite: true });
         }
@@ -66,7 +66,6 @@ function DraftableChef({
       onDragEnd() {
         const dropTarget = getDropTarget();
         if (dropTarget && this.hitTest(dropTarget, '20%')) {
-          // Successful drop — draft the chef
           gsap.to(dropTarget, { borderColor: '', backgroundColor: '', duration: 0.15 });
           gsap.to(btnRef.current, {
             scale: 0,
@@ -78,7 +77,6 @@ function DraftableChef({
             },
           });
         } else {
-          // Snap back
           if (dropTarget) {
             gsap.to(dropTarget, { borderColor: '', backgroundColor: '', duration: 0.15 });
           }
@@ -117,7 +115,7 @@ function DraftableChef({
 
   function handleMouseEnter() {
     if (btnRef.current) {
-      gsap.to(btnRef.current, { scale: 1.08, duration: 0.15, ease: 'power2.out' });
+      gsap.to(btnRef.current, { scale: 1.05, duration: 0.15, ease: 'power2.out' });
     }
   }
 
@@ -134,17 +132,22 @@ function DraftableChef({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       disabled={disabled}
-      className="flex flex-col items-center gap-1 rounded-lg border border-gray-200 bg-white p-2 shadow-sm transition-shadow hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+      className="flex flex-col items-center gap-1.5 rounded-lg bg-white p-2 shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] disabled:cursor-not-allowed disabled:opacity-50"
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-300 text-sm font-bold text-gray-500">
-        {chef.firstName[0]}{chef.lastName[0]}
+      <div className="relative h-14 w-14 overflow-hidden rounded-full bg-stone-light">
+        <Image
+          src={chef.imageUrl}
+          alt={chef.firstName}
+          fill
+          className="object-cover object-top"
+          sizes="56px"
+        />
       </div>
-      <span className="text-xs font-semibold text-gray-900">
+      <span className="font-display text-xs font-semibold text-charcoal">
         {chef.firstName}
       </span>
       <span
-        className="rounded-full px-1.5 py-0 text-[9px] font-bold uppercase text-white"
-        style={{ backgroundColor: TYPE_COLORS[chef.type] }}
+        className={`rounded-sm px-1.5 py-0 text-[8px] font-bold uppercase tracking-widest text-white ${TYPE_COLORS[chef.type]}`}
       >
         {TYPE_LABELS[chef.type]}
       </span>

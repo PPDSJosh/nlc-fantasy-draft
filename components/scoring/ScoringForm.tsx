@@ -41,7 +41,6 @@ export default function ScoringForm({
   const allResults = Object.values(results);
   const hasErrors = allResults.some((r) => validateResult(r).length > 0);
 
-  // Team totals
   const teamTotals = useMemo(() => {
     let joshTotal = 0;
     let wifeTotal = 0;
@@ -56,7 +55,6 @@ export default function ScoringForm({
       else if (chef.owner === 'wildcard') wildcardTotal += pts;
     }
 
-    // Wildcard points go to lower-scoring team
     if (joshTotal <= wifeTotal) {
       joshTotal += wildcardTotal;
     } else {
@@ -70,31 +68,30 @@ export default function ScoringForm({
     onSave(allResults);
   }
 
-  // Group chefs by owner
   const joshChefs = activeChefs.filter((c) => c.owner === 'josh');
   const wifeChefs = activeChefs.filter((c) => c.owner === 'wife');
   const wildcardChefs = activeChefs.filter((c) => c.owner === 'wildcard');
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Team Totals Summary */}
+      {/* Team Totals */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-lg bg-blue-50 p-4 text-center">
-          <p className="text-sm font-medium text-blue-600">Josh&apos;s Team</p>
-          <p className="text-2xl font-bold text-blue-800">
-            {teamTotals.joshTotal > 0 ? '+' : ''}{teamTotals.joshTotal} pts
+        <div className="rounded-xl border border-josh/20 bg-josh-light p-5 text-center">
+          <p className="text-xs font-medium uppercase tracking-wider text-josh">Josh&apos;s Team</p>
+          <p className="font-display text-3xl font-bold text-josh">
+            {teamTotals.joshTotal > 0 ? '+' : ''}{teamTotals.joshTotal}
           </p>
         </div>
-        <div className="rounded-lg bg-pink-50 p-4 text-center">
-          <p className="text-sm font-medium text-pink-600">Wife&apos;s Team</p>
-          <p className="text-2xl font-bold text-pink-800">
-            {teamTotals.wifeTotal > 0 ? '+' : ''}{teamTotals.wifeTotal} pts
+        <div className="rounded-xl border border-wife/20 bg-wife-light p-5 text-center">
+          <p className="text-xs font-medium uppercase tracking-wider text-wife">Wife&apos;s Team</p>
+          <p className="font-display text-3xl font-bold text-wife">
+            {teamTotals.wifeTotal > 0 ? '+' : ''}{teamTotals.wifeTotal}
           </p>
         </div>
       </div>
 
       {teamTotals.wildcardTotal !== 0 && (
-        <p className="text-center text-xs text-amber-600">
+        <p className="text-center text-xs text-gold">
           Wildcard ({teamTotals.wildcardTotal > 0 ? '+' : ''}{teamTotals.wildcardTotal} pts)
           assigned to {teamTotals.joshTotal <= teamTotals.wifeTotal ? "Josh's" : "Wife's"} team
         </p>
@@ -102,7 +99,7 @@ export default function ScoringForm({
 
       {/* Josh's Chefs */}
       <div>
-        <h3 className="mb-2 text-sm font-bold text-blue-700">Josh&apos;s Chefs</h3>
+        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-josh">Josh&apos;s Chefs</h3>
         <div className="flex flex-col gap-2">
           {joshChefs.map((chef) => (
             <ChefScoringRow
@@ -117,7 +114,7 @@ export default function ScoringForm({
 
       {/* Wife's Chefs */}
       <div>
-        <h3 className="mb-2 text-sm font-bold text-pink-700">Wife&apos;s Chefs</h3>
+        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-wife">Wife&apos;s Chefs</h3>
         <div className="flex flex-col gap-2">
           {wifeChefs.map((chef) => (
             <ChefScoringRow
@@ -133,7 +130,7 @@ export default function ScoringForm({
       {/* Wildcard */}
       {wildcardChefs.length > 0 && (
         <div>
-          <h3 className="mb-2 text-sm font-bold text-amber-700">Wildcard</h3>
+          <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gold">Wildcard</h3>
           <div className="flex flex-col gap-2">
             {wildcardChefs.map((chef) => (
               <ChefScoringRow
@@ -152,10 +149,10 @@ export default function ScoringForm({
         <button
           onClick={handleSave}
           disabled={hasErrors}
-          className={`rounded-full px-6 py-3 text-sm font-bold transition-colors ${
+          className={`rounded-lg px-8 py-3 text-sm font-bold uppercase tracking-wider transition-all ${
             hasErrors
-              ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-              : 'bg-green-600 text-white hover:bg-green-700'
+              ? 'cursor-not-allowed bg-stone-light text-warm-gray'
+              : 'bg-ink text-white shadow-lg hover:bg-charcoal hover:shadow-xl'
           }`}
         >
           Save Episode {episodeNumber}

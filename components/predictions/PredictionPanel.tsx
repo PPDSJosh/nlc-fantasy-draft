@@ -1,14 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Chef } from '@/lib/data/chefs';
-import { useGameStore, Prediction } from '@/lib/store/gameStore';
-
-const TYPE_COLORS: Record<string, string> = {
-  pro: '#3A5BA0',
-  social: '#9B4A8C',
-  home: '#5A8A4A',
-};
+import { useGameStore } from '@/lib/store/gameStore';
 
 interface PredictionPanelProps {
   episodeNumber: number;
@@ -27,7 +22,6 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
     existingPrediction?.chefId || null
   );
 
-  // Only show active chefs owned by this player
   const eligibleChefs = chefs.filter(
     (c) => c.owner === player && c.status === 'active'
   );
@@ -37,10 +31,9 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
 
   const playerLabel = player === 'josh' ? 'Josh' : 'Wife';
 
-  // Static class maps — dynamic template strings break Tailwind JIT
   const colorClasses = player === 'josh'
-    ? { text: 'text-blue-700', border: 'border-blue-200', bg: 'bg-blue-50' }
-    : { text: 'text-pink-700', border: 'border-pink-200', bg: 'bg-pink-50' };
+    ? { text: 'text-josh', border: 'border-josh/20', bg: 'bg-josh-light', accent: 'bg-josh' }
+    : { text: 'text-wife', border: 'border-wife/20', bg: 'bg-wife-light', accent: 'bg-wife' };
 
   function handleLock() {
     lockPrediction(episodeNumber, player, selectedChefId);
@@ -52,48 +45,62 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
     onComplete();
   }
 
-  // If already resolved, show result
+  // Resolved state
   if (isResolved && existingPrediction) {
     const predChef = chefs.find((c) => c.id === existingPrediction.chefId);
     return (
       <div className={`rounded-lg border p-4 ${
-        existingPrediction.correct ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'
+        existingPrediction.correct ? 'border-success/30 bg-success/5' : 'border-danger/30 bg-danger/5'
       }`}>
-        <p className={`text-sm font-bold ${colorClasses.text}`}>
+        <p className={`text-xs font-bold uppercase tracking-wider ${colorClasses.text}`}>
           {playerLabel}&apos;s Prediction
         </p>
         {existingPrediction.chefId ? (
           <>
-            <p className="mt-1 text-sm text-gray-700">
-              Predicted: <strong>{predChef?.firstName} {predChef?.lastName}</strong>
-            </p>
-            <p className={`mt-1 text-sm font-bold ${existingPrediction.correct ? 'text-green-700' : 'text-red-700'}`}>
-              {existingPrediction.correct ? 'Correct! +3 pts' : 'Incorrect. -2 pts'}
+            <div className="mt-2 flex items-center gap-2">
+              {predChef && (
+                <div className="relative h-7 w-7 overflow-hidden rounded-full bg-stone-light">
+                  <Image src={predChef.imageUrl} alt={predChef.firstName} fill className="object-cover object-top" sizes="28px" />
+                </div>
+              )}
+              <p className="text-sm text-charcoal">
+                <strong>{predChef?.firstName} {predChef?.lastName}</strong>
+              </p>
+            </div>
+            <p className={`mt-2 font-mono text-sm font-bold ${existingPrediction.correct ? 'text-success' : 'text-danger'}`}>
+              {existingPrediction.correct ? '+3 pts' : '-2 pts'}
             </p>
           </>
         ) : (
-          <p className="mt-1 text-sm text-gray-500">Skipped (0 pts)</p>
+          <p className="mt-1 text-sm text-warm-gray">Skipped (0 pts)</p>
         )}
       </div>
     );
   }
 
-  // If locked but not yet resolved
+  // Locked state
   if (isLocked && existingPrediction) {
     const predChef = chefs.find((c) => c.id === existingPrediction.chefId);
     return (
-      <div className="rounded-lg border border-yellow-300 bg-yellow-50 p-4">
-        <p className={`text-sm font-bold ${colorClasses.text}`}>
+      <div className="rounded-lg border border-gold/30 bg-gold-light p-4">
+        <p className={`text-xs font-bold uppercase tracking-wider ${colorClasses.text}`}>
           {playerLabel}&apos;s Prediction — Locked
         </p>
         {existingPrediction.chefId ? (
-          <p className="mt-1 text-sm text-gray-700">
-            Predicted: <strong>{predChef?.firstName} {predChef?.lastName}</strong> will survive
-          </p>
+          <div className="mt-2 flex items-center gap-2">
+            {predChef && (
+              <div className="relative h-7 w-7 overflow-hidden rounded-full bg-stone-light">
+                <Image src={predChef.imageUrl} alt={predChef.firstName} fill className="object-cover object-top" sizes="28px" />
+              </div>
+            )}
+            <p className="text-sm text-charcoal">
+              <strong>{predChef?.firstName} {predChef?.lastName}</strong> will survive
+            </p>
+          </div>
         ) : (
-          <p className="mt-1 text-sm text-gray-500">Skipped</p>
+          <p className="mt-1 text-sm text-warm-gray">Skipped</p>
         )}
-        <p className="mt-1 text-xs text-gray-400">
+        <p className="mt-2 text-[10px] text-warm-gray">
           Locked at {new Date(existingPrediction.lockedAt!).toLocaleString()}
         </p>
       </div>
@@ -102,11 +109,11 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
 
   return (
     <div className={`rounded-lg border ${colorClasses.border} ${colorClasses.bg} p-4`}>
-      <p className={`text-sm font-bold ${colorClasses.text}`}>
+      <p className={`text-xs font-bold uppercase tracking-wider ${colorClasses.text}`}>
         {playerLabel}&apos;s Prediction
       </p>
-      <p className="mt-1 text-xs text-gray-500">
-        Pick one of your chefs you think will survive this episode, or skip.
+      <p className="mt-1 text-xs text-warm-gray">
+        Pick one of your chefs you think will survive, or skip.
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -114,19 +121,16 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
           <button
             key={chef.id}
             onClick={() => setSelectedChefId(chef.id)}
-            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
+            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${
               selectedChefId === chef.id
-                ? 'border-gray-900 bg-gray-900 text-white'
-                : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                ? 'border-ink bg-ink text-white shadow-md'
+                : 'border-stone-light bg-white text-charcoal hover:border-stone'
             }`}
           >
-            <div
-              className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white"
-              style={{ backgroundColor: TYPE_COLORS[chef.type] }}
-            >
-              {chef.firstName[0]}
+            <div className="relative h-7 w-7 overflow-hidden rounded-full bg-stone-light">
+              <Image src={chef.imageUrl} alt={chef.firstName} fill className="object-cover object-top" sizes="28px" />
             </div>
-            {chef.firstName}
+            <span className="font-display text-sm">{chef.firstName}</span>
           </button>
         ))}
       </div>
@@ -135,17 +139,17 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
         <button
           onClick={handleLock}
           disabled={!selectedChefId}
-          className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+          className={`rounded-lg px-5 py-2 text-sm font-bold uppercase tracking-wider transition-all ${
             selectedChefId
-              ? 'bg-gray-900 text-white hover:bg-gray-800'
-              : 'cursor-not-allowed bg-gray-200 text-gray-400'
+              ? 'bg-ink text-white shadow-md hover:bg-charcoal'
+              : 'cursor-not-allowed bg-stone-light text-warm-gray'
           }`}
         >
           Lock Prediction
         </button>
         <button
           onClick={handleSkip}
-          className="rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-300"
+          className="rounded-lg bg-cream-dark px-5 py-2 text-sm font-medium text-warm-gray transition-colors hover:bg-stone-light"
         >
           Skip
         </button>

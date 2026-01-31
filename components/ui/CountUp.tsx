@@ -30,5 +30,5 @@ export default function CountUp({ value, className = '' }: CountUpProps) {
     prevValue.current = value;
   }, [value]);
 
-  return <span ref={ref} className={className}>{value}</span>;
+  return <span ref={ref} className={`font-mono ${className}`}>{value}</span>;
 }

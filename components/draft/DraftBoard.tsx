@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 import { useGameStore } from '@/lib/store/gameStore';
 import AvailableChefs from './AvailableChefs';
 import DraftSlot from './DraftSlot';
@@ -23,7 +24,6 @@ export default function DraftBoard() {
 
   const draftComplete = currentPick >= 14;
 
-  // Build slot arrays: which picks belong to josh and wife
   const joshPicks: number[] = [];
   const wifePicks: number[] = [];
   draftOrder.forEach((owner, i) => {
@@ -43,32 +43,36 @@ export default function DraftBoard() {
     router.push('/dashboard');
   }
 
-  // Get the correct drop zone ref for the current pick owner
   function getDropTarget(): HTMLDivElement | null {
     if (!currentOwner) return null;
     return currentOwner === 'josh' ? joshDropRef.current : wifeDropRef.current;
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {/* Current Pick Indicator */}
-      <div className="rounded-lg bg-gray-900 px-4 py-3 text-center text-white">
+      <div className="rounded-xl bg-ink px-6 py-4 text-center">
         {draftComplete ? (
-          <span className="text-lg font-bold">Draft Complete!</span>
+          <span className="font-display text-xl font-bold text-white">Draft Complete</span>
         ) : (
-          <span className="text-lg font-bold">
-            Round {roundNumber} &middot;{' '}
-            <span className={currentOwner === 'josh' ? 'text-blue-400' : 'text-pink-400'}>
-              {currentOwner === 'josh' ? "Josh's" : "Wife's"} Pick
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">
+              Round {roundNumber} of 14
             </span>
-          </span>
+            <span className="font-display text-xl font-bold text-white">
+              <span className={currentOwner === 'josh' ? 'text-josh' : 'text-wife'}>
+                {currentOwner === 'josh' ? "Josh's" : "Wife's"}
+              </span>
+              {' '}Pick
+            </span>
+          </div>
         )}
       </div>
 
       {/* Available Chefs Pool */}
       {!draftComplete && (
         <div>
-          <h2 className="mb-3 text-lg font-bold text-gray-900">
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-warm-gray">
             Available Chefs ({availableChefs.length})
           </h2>
           <AvailableChefs
@@ -82,28 +86,34 @@ export default function DraftBoard() {
 
       {/* Wildcard */}
       {draftComplete && availableChefs.length === 1 && !wildcardChef && (
-        <div className="rounded-lg border-2 border-amber-400 bg-amber-50 p-4 text-center">
-          <p className="text-sm font-bold uppercase tracking-wider text-amber-700">
+        <div className="rounded-xl border-2 border-gold bg-gold-light p-6 text-center">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gold">
             Wildcard
           </p>
-          <p className="mt-1 text-lg font-bold text-gray-900">
+          <div className="mx-auto mt-3 relative h-16 w-16 overflow-hidden rounded-full bg-stone-light">
+            <Image src={availableChefs[0].imageUrl} alt={availableChefs[0].firstName} fill className="object-cover object-top" sizes="64px" />
+          </div>
+          <p className="mt-3 font-display text-lg font-bold text-charcoal">
             {availableChefs[0].firstName} {availableChefs[0].lastName}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="mt-1 text-xs text-warm-gray">
             Auto-assigned to lower-scoring team each episode
           </p>
         </div>
       )}
 
       {wildcardChef && (
-        <div className="rounded-lg border-2 border-amber-400 bg-amber-50 p-4 text-center">
-          <p className="text-sm font-bold uppercase tracking-wider text-amber-700">
+        <div className="rounded-xl border-2 border-gold bg-gold-light p-6 text-center">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gold">
             Wildcard
           </p>
-          <p className="mt-1 text-lg font-bold text-gray-900">
+          <div className="mx-auto mt-3 relative h-16 w-16 overflow-hidden rounded-full bg-stone-light">
+            <Image src={wildcardChef.imageUrl} alt={wildcardChef.firstName} fill className="object-cover object-top" sizes="64px" />
+          </div>
+          <p className="mt-3 font-display text-lg font-bold text-charcoal">
             {wildcardChef.firstName} {wildcardChef.lastName}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="mt-1 text-xs text-warm-gray">
             Auto-assigned to lower-scoring team each episode
           </p>
         </div>
@@ -112,9 +122,11 @@ export default function DraftBoard() {
       {/* Team Columns */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Josh's Team */}
-        <div ref={joshDropRef}>
-          <h2 className="mb-3 text-lg font-bold text-blue-700">
-            Josh&apos;s Team ({joshChefs.length}/7)
+        <div ref={joshDropRef} className="rounded-xl border border-stone-light p-4 transition-colors">
+          <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold text-josh">
+            <span className="h-3 w-3 rounded-full bg-josh" />
+            Josh&apos;s Team
+            <span className="ml-auto font-mono text-sm font-medium text-warm-gray">{joshChefs.length}/7</span>
           </h2>
           <div className="flex flex-col gap-2">
             {joshPicks.map((pickIndex, slotIndex) => {
@@ -132,9 +144,11 @@ export default function DraftBoard() {
         </div>
 
         {/* Wife's Team */}
-        <div ref={wifeDropRef}>
-          <h2 className="mb-3 text-lg font-bold text-pink-700">
-            Wife&apos;s Team ({wifeChefs.length}/7)
+        <div ref={wifeDropRef} className="rounded-xl border border-stone-light p-4 transition-colors">
+          <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold text-wife">
+            <span className="h-3 w-3 rounded-full bg-wife" />
+            Wife&apos;s Team
+            <span className="ml-auto font-mono text-sm font-medium text-warm-gray">{wifeChefs.length}/7</span>
           </h2>
           <div className="flex flex-col gap-2">
             {wifePicks.map((pickIndex, slotIndex) => {
@@ -157,7 +171,7 @@ export default function DraftBoard() {
         {currentPick > 0 && !wildcardChef && (
           <button
             onClick={undoLastPick}
-            className="rounded-full bg-gray-200 px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-300"
+            className="rounded-lg bg-cream-dark px-5 py-2.5 text-sm font-medium text-warm-gray transition-colors hover:bg-stone-light"
           >
             Undo Last Pick
           </button>
@@ -165,7 +179,7 @@ export default function DraftBoard() {
         {draftComplete && !wildcardChef && (
           <button
             onClick={handleFinalize}
-            className="rounded-full bg-green-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
+            className="rounded-lg bg-ink px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl"
           >
             Start Season
           </button>
@@ -173,7 +187,7 @@ export default function DraftBoard() {
         {wildcardChef && (
           <button
             onClick={() => router.push('/dashboard')}
-            className="rounded-full bg-green-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
+            className="rounded-lg bg-ink px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl"
           >
             Go to Dashboard
           </button>

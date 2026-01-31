@@ -1,18 +1,32 @@
 'use client';
 
+import Image from 'next/image';
 import { Chef } from '@/lib/data/chefs';
 import Modal from '@/components/ui/Modal';
 
 const TYPE_COLORS: Record<Chef['type'], string> = {
-  pro: '#3A5BA0',
-  social: '#9B4A8C',
-  home: '#5A8A4A',
+  pro: 'bg-pro',
+  social: 'bg-social',
+  home: 'bg-home',
+};
+
+const TYPE_TEXT: Record<Chef['type'], string> = {
+  pro: 'text-pro',
+  social: 'text-social',
+  home: 'text-home',
 };
 
 const TYPE_LABELS: Record<Chef['type'], string> = {
-  pro: 'PRO',
-  social: 'SOCIAL',
-  home: 'HOME',
+  pro: 'Professional Chef',
+  social: 'Social Media Chef',
+  home: 'Home Cook',
+};
+
+const OWNER_LABELS: Record<string, { label: string; color: string }> = {
+  josh: { label: "Josh's Team", color: 'text-josh' },
+  wife: { label: "Wife's Team", color: 'text-wife' },
+  wildcard: { label: 'Wildcard', color: 'text-gold' },
+  undrafted: { label: 'Undrafted', color: 'text-warm-gray' },
 };
 
 interface ChefModalProps {
@@ -25,50 +39,78 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
   if (!chef) return null;
 
   const isEliminated = chef.status === 'eliminated';
+  const ownerInfo = OWNER_LABELS[chef.owner];
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="overflow-hidden rounded-xl">
-        {/* Large photo area — 16:9 aspect ratio */}
+      <div className="flex flex-col">
+        {/* Hero image */}
         <div
-          className={`relative flex aspect-video w-full items-center justify-center bg-gray-300 ${
+          className={`relative aspect-[4/3] w-full overflow-hidden ${
             isEliminated ? 'grayscale' : ''
           }`}
         >
-          <span className="text-6xl text-gray-500">
-            {chef.firstName[0]}
-            {chef.lastName[0]}
-          </span>
+          <Image
+            src={chef.imageUrl}
+            alt={`${chef.firstName} ${chef.lastName}`}
+            fill
+            className="object-cover object-top"
+            sizes="(max-width: 768px) 100vw, 512px"
+            priority
+          />
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+
+          {/* Name overlay on image */}
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <h2 className="font-display text-3xl font-bold text-white drop-shadow-lg">
+              {chef.firstName} {chef.lastName}
+            </h2>
+          </div>
+
           {isEliminated && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-              <span className="rounded bg-red-600 px-3 py-1.5 text-sm font-bold uppercase tracking-wider text-white">
+            <div className="absolute left-4 top-4">
+              <span className="rounded-sm bg-danger px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-lg">
                 Eliminated
+                {chef.eliminatedEpisode !== null && ` — EP ${chef.eliminatedEpisode}`}
               </span>
             </div>
           )}
         </div>
 
         {/* Info section */}
-        <div className="flex flex-col gap-3 p-5">
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-gray-900">
-              {chef.firstName} {chef.lastName}
-            </h2>
-            <span
-              className="rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-white"
-              style={{ backgroundColor: TYPE_COLORS[chef.type] }}
-            >
-              {TYPE_LABELS[chef.type]}
-            </span>
+        <div className="flex flex-col gap-4 p-5">
+          {/* Type + Status row */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span
+                className={`rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white ${TYPE_COLORS[chef.type]}`}
+              >
+                {TYPE_LABELS[chef.type]}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  isEliminated ? 'bg-danger' : 'bg-success'
+                }`}
+              />
+              <span className="text-xs font-medium text-warm-gray">
+                {isEliminated ? 'Eliminated' : 'Active'}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Status:</span>
-            <span
-              className={`text-sm font-semibold ${
-                isEliminated ? 'text-red-600' : 'text-green-600'
-              }`}
-            >
-              {isEliminated ? 'Eliminated' : 'Active'}
+
+          {/* Divider */}
+          <div className="h-px bg-stone-light" />
+
+          {/* Team info */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wider text-warm-gray">
+              Team
+            </span>
+            <span className={`text-sm font-bold ${ownerInfo.color}`}>
+              {ownerInfo.label}
             </span>
           </div>
         </div>

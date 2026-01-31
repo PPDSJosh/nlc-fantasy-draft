@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useGameStore } from '@/lib/store/gameStore';
 import { calculatePoints } from '@/lib/data/scoring';
 import CountUp from '@/components/ui/CountUp';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function DashboardPage() {
@@ -23,9 +24,8 @@ export default function DashboardPage() {
       wifeCumulative: number;
     }[] = [];
 
-    const chefTotalPoints: Record<string, { chefId: string; firstName: string; lastName: string; owner: string; totalPoints: number }> = {};
+    const chefTotalPoints: Record<string, { chefId: string; firstName: string; lastName: string; owner: string; imageUrl: string; totalPoints: number }> = {};
 
-    // Initialize chef totals
     for (const chef of chefs) {
       if (chef.owner !== 'undrafted') {
         chefTotalPoints[chef.id] = {
@@ -33,12 +33,12 @@ export default function DashboardPage() {
           firstName: chef.firstName,
           lastName: chef.lastName,
           owner: chef.owner,
+          imageUrl: chef.imageUrl,
           totalPoints: 0,
         };
       }
     }
 
-    // Sort episodes by number
     const sortedEpisodes = [...episodes].sort(
       (a, b) => a.episodeNumber - b.episodeNumber
     );
@@ -62,7 +62,6 @@ export default function DashboardPage() {
         else if (chef.owner === 'wildcard') wildcardScore += pts;
       }
 
-      // Add prediction bonuses
       const joshPred = predictions.find(
         (p) => p.episodeNumber === ep.episodeNumber && p.player === 'josh'
       );
@@ -76,7 +75,6 @@ export default function DashboardPage() {
       if (wifePred?.correct === true) wifeEpScore += 3;
       else if (wifePred?.correct === false) wifeEpScore -= 2;
 
-      // Wildcard goes to lower-scoring team
       if (joshEpScore <= wifeEpScore) {
         joshEpScore += wildcardScore;
       } else {
@@ -98,7 +96,6 @@ export default function DashboardPage() {
       });
     }
 
-    // Top performers
     const topPerformers = Object.values(chefTotalPoints)
       .sort((a, b) => b.totalPoints - a.totalPoints)
       .slice(0, 10);
@@ -114,36 +111,41 @@ export default function DashboardPage() {
   }, [chefs, episodes, predictions]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Season Dashboard</h1>
-          <p className="mt-1 text-lg text-gray-500">
-            {episodes.length} episodes scored
-          </p>
-        </div>
+    <div className="min-h-screen bg-cream">
+      {/* Dark Hero */}
+      <div className="bg-ink px-4 py-16 text-center">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+          Season Dashboard
+        </p>
+        <h1 className="mt-3 font-display text-4xl font-bold text-white sm:text-5xl">
+          The Scoreboard
+        </h1>
+        <p className="mt-2 text-sm text-white/50">
+          {episodes.length} episode{episodes.length !== 1 ? 's' : ''} scored
+        </p>
 
         {/* Season Totals */}
-        <div className="mb-8 grid grid-cols-2 gap-4">
-          <div className="rounded-xl bg-blue-50 p-6 text-center">
-            <p className="text-sm font-medium text-blue-600">Josh</p>
-            <p className="text-4xl font-bold text-blue-800"><CountUp value={stats.joshSeasonTotal} /></p>
-            <p className="mt-1 text-sm text-blue-500">{stats.joshWins} weekly wins</p>
+        <div className="mx-auto mt-10 grid max-w-md grid-cols-2 gap-6">
+          <div className="rounded-xl border border-josh/30 bg-josh/10 p-6">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-josh">Josh</p>
+            <p className="mt-2 font-display text-5xl font-bold text-white"><CountUp value={stats.joshSeasonTotal} /></p>
+            <p className="mt-1 font-mono text-xs text-josh/70">{stats.joshWins} wins</p>
           </div>
-          <div className="rounded-xl bg-pink-50 p-6 text-center">
-            <p className="text-sm font-medium text-pink-600">Wife</p>
-            <p className="text-4xl font-bold text-pink-800"><CountUp value={stats.wifeSeasonTotal} /></p>
-            <p className="mt-1 text-sm text-pink-500">{stats.wifeWins} weekly wins</p>
+          <div className="rounded-xl border border-wife/30 bg-wife/10 p-6">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-wife">Wife</p>
+            <p className="mt-2 font-display text-5xl font-bold text-white"><CountUp value={stats.wifeSeasonTotal} /></p>
+            <p className="mt-1 font-mono text-xs text-wife/70">{stats.wifeWins} wins</p>
           </div>
         </div>
+      </div>
 
-        {/* Score Progression Chart (Line Graph) */}
+      <div className="mx-auto max-w-4xl px-4 py-10">
+        {/* Score Progression Chart */}
         {stats.episodeScores.length > 0 && (() => {
           const chartW = 600;
-          const chartH = 200;
-          const padX = 40;
-          const padY = 20;
+          const chartH = 220;
+          const padX = 44;
+          const padY = 24;
           const plotW = chartW - padX * 2;
           const plotH = chartH - padY * 2;
           const n = stats.episodeScores.length;
@@ -159,40 +161,37 @@ export default function DashboardPage() {
           const wifeLine = stats.episodeScores.map((ep, i) => `${x(i)},${y(ep.wifeCumulative)}`).join(' ');
 
           return (
-            <div className="mb-8 rounded-xl bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-bold text-gray-900">Score Progression</h2>
+            <div className="mb-8 rounded-xl bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-warm-gray">Score Progression</h2>
               <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" preserveAspectRatio="xMidYMid meet">
-                {/* Grid lines */}
                 {[0, 0.25, 0.5, 0.75, 1].map((frac) => {
                   const yPos = padY + plotH * (1 - frac);
                   const val = Math.round(minVal + range * frac);
                   return (
                     <g key={frac}>
-                      <line x1={padX} y1={yPos} x2={chartW - padX} y2={yPos} stroke="#e5e7eb" strokeWidth="1" />
-                      <text x={padX - 4} y={yPos + 3} textAnchor="end" fontSize="10" fill="#9ca3af">{val}</text>
+                      <line x1={padX} y1={yPos} x2={chartW - padX} y2={yPos} stroke="var(--stone-light)" strokeWidth="1" />
+                      <text x={padX - 6} y={yPos + 3} textAnchor="end" fontSize="10" fill="var(--warm-gray)" fontFamily="var(--font-geist-mono)">{val}</text>
                     </g>
                   );
                 })}
-                {/* Lines */}
-                <polyline points={joshLine} fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <polyline points={wifeLine} fill="none" stroke="#ec4899" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                {/* Dots + labels */}
+                <polyline points={joshLine} fill="none" stroke="var(--josh)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <polyline points={wifeLine} fill="none" stroke="var(--wife)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 {stats.episodeScores.map((ep, i) => (
                   <g key={ep.episodeNumber}>
-                    <circle cx={x(i)} cy={y(ep.joshCumulative)} r="4" fill="#3b82f6" />
-                    <circle cx={x(i)} cy={y(ep.wifeCumulative)} r="4" fill="#ec4899" />
-                    <text x={x(i)} y={chartH - 4} textAnchor="middle" fontSize="10" fill="#9ca3af">
+                    <circle cx={x(i)} cy={y(ep.joshCumulative)} r="4" fill="var(--josh)" />
+                    <circle cx={x(i)} cy={y(ep.wifeCumulative)} r="4" fill="var(--wife)" />
+                    <text x={x(i)} y={chartH - 4} textAnchor="middle" fontSize="10" fill="var(--warm-gray)" fontFamily="var(--font-geist-mono)">
                       Ep {ep.episodeNumber}
                     </text>
                   </g>
                 ))}
               </svg>
-              <div className="mt-2 flex justify-center gap-4 text-xs">
-                <span className="flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-blue-500" /> Josh
+              <div className="mt-3 flex justify-center gap-6 text-xs text-warm-gray">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-josh" /> Josh
                 </span>
-                <span className="flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-pink-500" /> Wife
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-wife" /> Wife
                 </span>
               </div>
             </div>
@@ -200,46 +199,49 @@ export default function DashboardPage() {
         })()}
 
         {/* Top Performers */}
-        <div className="mb-8 rounded-xl bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold text-gray-900">Top Performers</h2>
+        <div className="mb-8 rounded-xl bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-warm-gray">Top Performers</h2>
           {stats.topPerformers.length === 0 ? (
-            <p className="text-sm text-gray-400">No episodes scored yet</p>
+            <p className="text-sm text-stone">No episodes scored yet</p>
           ) : (
             <div className="flex flex-col gap-2">
               {stats.topPerformers.map((perf, i) => (
                 <div
                   key={perf.chefId}
-                  className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2"
+                  className="flex items-center justify-between rounded-lg border border-stone-light/50 px-3 py-2.5"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-600">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-charcoal/5 font-mono text-[10px] font-bold text-warm-gray">
                       {i + 1}
                     </span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <div className="relative h-8 w-8 overflow-hidden rounded-full bg-stone-light">
+                      <Image src={perf.imageUrl} alt={perf.firstName} fill className="object-cover object-top" sizes="32px" />
+                    </div>
+                    <span className="font-display text-sm font-semibold text-charcoal">
                       {perf.firstName} {perf.lastName}
                     </span>
                     <span
-                      className={`text-xs font-medium ${
+                      className={`text-[10px] font-bold uppercase tracking-wider ${
                         perf.owner === 'josh'
-                          ? 'text-blue-600'
+                          ? 'text-josh'
                           : perf.owner === 'wife'
-                          ? 'text-pink-600'
-                          : 'text-amber-600'
+                          ? 'text-wife'
+                          : 'text-gold'
                       }`}
                     >
-                      ({perf.owner === 'josh' ? 'Josh' : perf.owner === 'wife' ? 'Wife' : 'Wildcard'})
+                      {perf.owner === 'josh' ? 'Josh' : perf.owner === 'wife' ? 'Wife' : 'WC'}
                     </span>
                   </div>
                   <span
-                    className={`text-sm font-bold ${
+                    className={`font-mono text-sm font-bold ${
                       perf.totalPoints > 0
-                        ? 'text-green-600'
+                        ? 'text-success'
                         : perf.totalPoints < 0
-                        ? 'text-red-600'
-                        : 'text-gray-400'
+                        ? 'text-danger'
+                        : 'text-warm-gray'
                     }`}
                   >
-                    {perf.totalPoints > 0 ? '+' : ''}{perf.totalPoints} pts
+                    {perf.totalPoints > 0 ? '+' : ''}{perf.totalPoints}
                   </span>
                 </div>
               ))}
@@ -248,33 +250,33 @@ export default function DashboardPage() {
         </div>
 
         {/* Episode History */}
-        <div className="mb-8 rounded-xl bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold text-gray-900">Episode History</h2>
+        <div className="mb-8 rounded-xl bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-warm-gray">Episode History</h2>
           {stats.episodeScores.length === 0 ? (
-            <p className="text-sm text-gray-400">No episodes scored yet</p>
+            <p className="text-sm text-stone">No episodes scored yet</p>
           ) : (
             <div className="flex flex-col gap-2">
               {stats.episodeScores.map((ep) => (
                 <Link
                   key={ep.episodeNumber}
                   href={`/episode/${ep.episodeNumber}`}
-                  className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-3 transition-colors hover:bg-gray-50"
+                  className="flex items-center justify-between rounded-lg border border-stone-light/50 px-4 py-3 transition-all hover:bg-cream-dark hover:shadow-sm"
                 >
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="font-display text-sm font-semibold text-charcoal">
                     Episode {ep.episodeNumber}
                   </span>
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-bold text-blue-600">
-                      Josh: {ep.joshScore > 0 ? '+' : ''}{ep.joshScore}
+                    <span className="font-mono text-sm font-bold text-josh">
+                      {ep.joshScore > 0 ? '+' : ''}{ep.joshScore}
                     </span>
-                    <span className="text-sm font-bold text-pink-600">
-                      Wife: {ep.wifeScore > 0 ? '+' : ''}{ep.wifeScore}
+                    <span className="font-mono text-sm font-bold text-wife">
+                      {ep.wifeScore > 0 ? '+' : ''}{ep.wifeScore}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-warm-gray">
                       {ep.joshScore > ep.wifeScore
-                        ? 'Josh wins'
+                        ? 'Josh'
                         : ep.wifeScore > ep.joshScore
-                        ? 'Wife wins'
+                        ? 'Wife'
                         : 'Tie'}
                     </span>
                   </div>
@@ -288,13 +290,13 @@ export default function DashboardPage() {
         <div className="flex justify-center gap-3">
           <Link
             href={`/episode/${seasonEpisode}`}
-            className="rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+            className="rounded-lg bg-ink px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl"
           >
             Score Episode {seasonEpisode}
           </Link>
           <Link
             href="/"
-            className="rounded-full bg-gray-200 px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-300"
+            className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg"
           >
             View All Chefs
           </Link>
