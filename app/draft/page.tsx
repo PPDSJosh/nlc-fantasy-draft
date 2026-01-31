@@ -10,15 +10,17 @@ export default function DraftPage() {
   const phase = useGameStore((s) => s.phase);
 
   useEffect(() => {
-    if (phase !== 'draft' && phase !== 'season') {
+    if (phase === 'season') {
+      router.push('/dashboard');
+    } else if (phase !== 'draft') {
       router.push('/pre-draft');
     }
   }, [phase, router]);
 
-  if (phase !== 'draft' && phase !== 'season') {
+  if (phase !== 'draft') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-cream">
-        <p className="text-warm-gray">Redirecting to pre-draft...</p>
+        <p className="text-warm-gray">Redirecting...</p>
       </div>
     );
   }

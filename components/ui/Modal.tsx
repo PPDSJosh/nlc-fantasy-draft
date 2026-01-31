@@ -95,7 +95,7 @@ export default function Modal({ isOpen, onClose, children, size = 'default' }: M
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/90 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/95 p-4 backdrop-blur-md"
     >
       <div
         ref={contentRef}

@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import { useGameStore } from '@/lib/store/gameStore';
 import { EpisodeResult } from '@/lib/data/scoring';
 import ScoringForm from '@/components/scoring/ScoringForm';
@@ -12,7 +12,23 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
   const episodeNumber = parseInt(num, 10);
   const router = useRouter();
 
-  const { chefs, episodes, predictions, saveEpisode, resolvePredictions, advanceSeasonEpisode } = useGameStore();
+  const { chefs, episodes, predictions, saveEpisode, resolvePredictions, advanceSeasonEpisode, seasonEpisode, phase } = useGameStore();
+
+  const isInvalidEpisode = isNaN(episodeNumber) || episodeNumber < 1 || episodeNumber > seasonEpisode || phase !== 'season';
+
+  useEffect(() => {
+    if (isInvalidEpisode) {
+      router.push('/dashboard');
+    }
+  }, [isInvalidEpisode, router]);
+
+  if (isInvalidEpisode) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-cream">
+        <p className="text-warm-gray">Redirecting...</p>
+      </div>
+    );
+  }
 
   const activeChefs = chefs.filter(
     (c) => c.status === 'active' || (c.status === 'eliminated' && c.eliminatedEpisode === episodeNumber)
@@ -61,6 +77,16 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-10">
+        {/* Already scored warning */}
+        {existingEpisode?.scored && (
+          <div className="mb-6 rounded-lg border border-gold/30 bg-gold/5 px-4 py-3 text-center">
+            <p className="text-xs font-bold uppercase tracking-wider text-gold">Already Scored</p>
+            <p className="mt-1 text-xs text-warm-gray">
+              This episode has been scored. Saving again will overwrite the previous results.
+            </p>
+          </div>
+        )}
+
         {/* Prediction Phase */}
         {!bothPredictionsLocked && (
           <div className="mb-8">

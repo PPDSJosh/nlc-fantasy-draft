@@ -17,8 +17,10 @@ const FILTERS: { label: string; value: FilterType }[] = [
 
 export default function Home() {
   const chefs = useGameStore((s) => s.chefs);
-  const [selectedChef, setSelectedChef] = useState<Chef | null>(null);
+  const [selectedChefId, setSelectedChefId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>('all');
+
+  const selectedChef = selectedChefId ? chefs.find((c) => c.id === selectedChefId) ?? null : null;
 
   const filteredChefs =
     filter === 'all' ? chefs : chefs.filter((c) => c.type === filter);
@@ -65,7 +67,7 @@ export default function Home() {
             <ChefCard
               key={chef.id}
               chef={chef}
-              onClick={setSelectedChef}
+              onClick={(c) => setSelectedChefId(c.id)}
             />
           ))}
         </div>
@@ -74,8 +76,8 @@ export default function Home() {
       {/* Chef Detail Modal */}
       <ChefModal
         chef={selectedChef}
-        isOpen={selectedChef !== null}
-        onClose={() => setSelectedChef(null)}
+        isOpen={selectedChefId !== null}
+        onClose={() => setSelectedChefId(null)}
       />
     </div>
   );

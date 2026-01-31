@@ -97,12 +97,12 @@ export default function Nav() {
         </div>
       </div>
       {/* Mobile nav */}
-      <div className="flex items-center justify-center gap-1 border-t border-white/5 px-2 py-2 sm:hidden">
+      <div className="flex items-center justify-center gap-0.5 border-t border-white/5 px-1 py-1.5 sm:hidden">
         {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className={`rounded-lg px-3 py-1.5 text-xs transition-all ${
+            className={`rounded-lg px-2.5 py-1.5 text-[11px] transition-all ${
               pathname === link.href
                 ? 'bg-white/10 font-semibold text-white'
                 : 'text-white/40 hover:text-white/80'
