@@ -113,28 +113,28 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-cream">
       {/* Dark Hero */}
-      <div className="bg-ink px-4 py-20 text-center">
+      <div className="bg-ink px-4 py-12 text-center sm:py-16 md:py-20">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
           Season Dashboard
         </p>
-        <h1 className="mt-4 font-display text-5xl font-bold text-white sm:text-6xl">
+        <h1 className="mt-3 font-display text-3xl font-bold text-white sm:mt-4 sm:text-5xl md:text-6xl">
           The Scoreboard
         </h1>
-        <p className="mt-3 text-sm text-white/30">
+        <p className="mt-2 text-sm text-white/30 sm:mt-3">
           {episodes.length} episode{episodes.length !== 1 ? 's' : ''} scored
         </p>
 
         {/* Season Totals — solid colored backgrounds */}
-        <div className="mx-auto mt-12 grid max-w-md grid-cols-2 gap-4">
-          <div className="rounded-lg bg-josh p-6">
+        <div className="mx-auto mt-8 grid max-w-md grid-cols-2 gap-3 sm:mt-12 sm:gap-4">
+          <div className="rounded-lg bg-josh p-4 sm:p-6">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Josh</p>
-            <p className="mt-2 font-display text-5xl font-bold text-white"><CountUp value={stats.joshSeasonTotal} /></p>
-            <p className="mt-1 font-mono text-xs text-white/40">{stats.joshWins} wins</p>
+            <p className="mt-1 font-display text-3xl font-bold text-white sm:mt-2 sm:text-4xl md:text-5xl"><CountUp value={stats.joshSeasonTotal} /></p>
+            <p className="mt-1 font-mono text-[10px] text-white/40 sm:text-xs">{stats.joshWins} wins</p>
           </div>
-          <div className="rounded-lg bg-jazzy p-6">
+          <div className="rounded-lg bg-jazzy p-4 sm:p-6">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Jazzy</p>
-            <p className="mt-2 font-display text-5xl font-bold text-white"><CountUp value={stats.jazzySeasonTotal} /></p>
-            <p className="mt-1 font-mono text-xs text-white/40">{stats.jazzyWins} wins</p>
+            <p className="mt-1 font-display text-3xl font-bold text-white sm:mt-2 sm:text-4xl md:text-5xl"><CountUp value={stats.jazzySeasonTotal} /></p>
+            <p className="mt-1 font-mono text-[10px] text-white/40 sm:text-xs">{stats.jazzyWins} wins</p>
           </div>
         </div>
       </div>
@@ -208,20 +208,20 @@ export default function DashboardPage() {
               {stats.topPerformers.map((perf, i) => (
                 <div
                   key={perf.chefId}
-                  className="flex items-center justify-between rounded-lg border border-stone-light/30 px-3 py-2.5"
+                  className="flex items-center justify-between rounded-lg border border-stone-light/30 px-2.5 py-2 sm:px-3 sm:py-2.5"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-6 w-6 items-center justify-center font-mono text-[11px] font-bold text-warm-gray">
+                  <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center font-mono text-[10px] font-bold text-warm-gray sm:h-6 sm:w-6 sm:text-[11px]">
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <div className="relative h-8 w-8 overflow-hidden rounded-full shadow-sm">
+                    <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full shadow-sm sm:h-8 sm:w-8">
                       <Image src={perf.imageUrl} alt={perf.firstName} fill className="object-cover object-top" sizes="32px" />
                     </div>
-                    <span className="font-display text-sm font-semibold text-charcoal">
+                    <span className="truncate font-display text-xs font-semibold text-charcoal sm:text-sm">
                       {perf.firstName} {perf.lastName}
                     </span>
                     <span
-                      className={`text-[9px] font-bold uppercase tracking-wider ${
+                      className={`shrink-0 text-[8px] font-bold uppercase tracking-wider sm:text-[9px] ${
                         perf.owner === 'josh'
                           ? 'text-josh'
                           : perf.owner === 'wife'
@@ -233,7 +233,7 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   <span
-                    className={`font-mono text-sm font-bold ${
+                    className={`shrink-0 font-mono text-xs font-bold sm:text-sm ${
                       perf.totalPoints > 0
                         ? 'text-success'
                         : perf.totalPoints < 0
@@ -265,31 +265,31 @@ export default function DashboardPage() {
                   className="group flex items-stretch overflow-hidden rounded-lg transition-all hover:shadow-md"
                 >
                   {/* Episode number — dark block */}
-                  <div className="flex w-16 shrink-0 flex-col items-center justify-center bg-ink py-3">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-white/30">EP</span>
-                    <span className="font-display text-xl font-bold text-white">
+                  <div className="flex w-12 shrink-0 flex-col items-center justify-center bg-ink py-2.5 sm:w-16 sm:py-3">
+                    <span className="font-mono text-[8px] font-bold uppercase tracking-wider text-white/30 sm:text-[9px]">EP</span>
+                    <span className="font-display text-base font-bold text-white sm:text-xl">
                       {String(ep.episodeNumber).padStart(2, '0')}
                     </span>
                   </div>
 
                   {/* Scores */}
-                  <div className="flex flex-1 items-center justify-between bg-white px-5 py-3">
-                    <div className="flex items-center gap-5">
+                  <div className="flex flex-1 items-center justify-between bg-white px-3 py-2.5 sm:px-5 sm:py-3">
+                    <div className="flex items-center gap-3 sm:gap-5">
                       <div className="text-center">
-                        <span className="block text-[9px] font-bold uppercase tracking-wider text-josh/50">Josh</span>
-                        <span className="font-mono text-sm font-bold text-josh">
+                        <span className="block text-[8px] font-bold uppercase tracking-wider text-josh/50 sm:text-[9px]">Josh</span>
+                        <span className="font-mono text-xs font-bold text-josh sm:text-sm">
                           {ep.joshScore > 0 ? '+' : ''}{ep.joshScore}
                         </span>
                       </div>
-                      <span className="text-[10px] text-stone-light">vs</span>
+                      <span className="text-[9px] text-stone-light sm:text-[10px]">vs</span>
                       <div className="text-center">
-                        <span className="block text-[9px] font-bold uppercase tracking-wider text-jazzy/50">Jazzy</span>
-                        <span className="font-mono text-sm font-bold text-jazzy">
+                        <span className="block text-[8px] font-bold uppercase tracking-wider text-jazzy/50 sm:text-[9px]">Jazzy</span>
+                        <span className="font-mono text-xs font-bold text-jazzy sm:text-sm">
                           {ep.jazzyScore > 0 ? '+' : ''}{ep.jazzyScore}
                         </span>
                       </div>
                     </div>
-                    <span className={`rounded-[3px] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white ${
+                    <span className={`rounded-[3px] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white sm:px-2 sm:text-[9px] ${
                       ep.joshScore > ep.jazzyScore ? 'bg-josh' : ep.jazzyScore > ep.joshScore ? 'bg-jazzy' : 'bg-warm-gray'
                     }`}>
                       {ep.joshScore > ep.jazzyScore ? 'Josh' : ep.jazzyScore > ep.joshScore ? 'Jazzy' : 'Tie'}
@@ -307,16 +307,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="flex justify-center gap-3">
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href={`/episode/${seasonEpisode}`}
-            className="rounded-lg bg-ink px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl"
+            className="w-full rounded-lg bg-ink px-6 py-2.5 text-center text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl sm:w-auto"
           >
             Score Episode {seasonEpisode}
           </Link>
           <Link
             href="/"
-            className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg"
+            className="w-full rounded-lg bg-white px-6 py-2.5 text-center text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg sm:w-auto"
           >
             View All Chefs
           </Link>

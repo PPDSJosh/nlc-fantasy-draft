@@ -75,16 +75,16 @@ export default function ScoringForm({
   return (
     <div className="flex flex-col gap-6">
       {/* Team Totals */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-lg border border-josh/20 bg-josh/5 p-5 text-center">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="rounded-lg border border-josh/20 bg-josh/5 p-4 text-center sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-josh">Josh&apos;s Team</p>
-          <p className="mt-1 font-display text-3xl font-bold text-josh">
+          <p className="mt-1 font-display text-2xl font-bold text-josh sm:text-3xl">
             {teamTotals.joshTotal > 0 ? '+' : ''}{teamTotals.joshTotal}
           </p>
         </div>
-        <div className="rounded-lg border border-jazzy/20 bg-jazzy/5 p-5 text-center">
+        <div className="rounded-lg border border-jazzy/20 bg-jazzy/5 p-4 text-center sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-jazzy">Jazzy&apos;s Team</p>
-          <p className="mt-1 font-display text-3xl font-bold text-jazzy">
+          <p className="mt-1 font-display text-2xl font-bold text-jazzy sm:text-3xl">
             {teamTotals.jazzyTotal > 0 ? '+' : ''}{teamTotals.jazzyTotal}
           </p>
         </div>

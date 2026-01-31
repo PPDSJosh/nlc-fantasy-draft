@@ -26,14 +26,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-cream">
       {/* Hero */}
-      <div className="bg-ink px-4 py-20 text-center">
+      <div className="bg-ink px-4 py-12 text-center sm:py-16 md:py-20">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
           Season 5
         </p>
-        <h1 className="mt-4 font-display text-5xl font-bold text-white sm:text-6xl lg:text-7xl">
+        <h1 className="mt-3 font-display text-3xl font-bold text-white sm:mt-4 sm:text-5xl md:text-6xl lg:text-7xl">
           Next Level Chef
         </h1>
-        <p className="mt-3 text-sm tracking-wide text-white/30">
+        <p className="mt-2 text-sm tracking-wide text-white/30 sm:mt-3">
           Fantasy Draft
         </p>
       </div>
@@ -43,7 +43,7 @@ export default function Home() {
 
       <div className="mx-auto max-w-6xl px-4 py-10">
         {/* Filter Tabs */}
-        <div className="mb-10 flex justify-center gap-1">
+        <div className="mb-8 flex flex-wrap justify-center gap-1 sm:mb-10">
           {FILTERS.map((f) => (
             <button
               key={f.value}

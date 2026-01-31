@@ -49,7 +49,7 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
       <div className="flex flex-col md:flex-row">
         {/* Photo side */}
         <div
-          className={`relative aspect-[3/4] w-full overflow-hidden md:aspect-auto md:w-2/5 md:min-h-[520px] ${
+          className={`relative aspect-[4/5] w-full overflow-hidden md:aspect-auto md:w-2/5 md:min-h-[420px] ${
             isEliminated ? 'grayscale' : ''
           }`}
         >
@@ -82,11 +82,11 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
         </div>
 
         {/* Content side */}
-        <div className="flex flex-1 flex-col justify-center p-6 sm:p-8 md:p-10">
-          <h2 className="font-display text-4xl font-bold leading-none text-charcoal sm:text-5xl">
+        <div className="flex flex-1 flex-col justify-center p-5 sm:p-8 md:p-10">
+          <h2 className="font-display text-3xl font-bold leading-none text-charcoal sm:text-4xl md:text-5xl">
             {chef.firstName}
           </h2>
-          <p className="mt-1 font-display text-xl text-warm-gray sm:text-2xl">
+          <p className="mt-1 font-display text-lg text-warm-gray sm:text-xl md:text-2xl">
             {chef.lastName}
           </p>
 
@@ -107,7 +107,7 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
           <div className="mt-6 h-px w-full bg-stone-light/50" />
 
           {/* Meta grid — 3 columns */}
-          <div className="mt-6 grid grid-cols-3 gap-4">
+          <div className="mt-5 grid grid-cols-3 gap-3 sm:mt-6 sm:gap-4">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-warm-gray">
                 Type

@@ -44,9 +44,9 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
 
   return (
     <div className={`rounded-xl border p-3 transition-colors ${errors.length > 0 ? 'border-danger/30 bg-danger/5' : 'border-stone-light/50 bg-white'}`}>
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Chef info */}
-        <div className="flex min-w-[140px] items-center gap-2.5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+        {/* Chef info + Points (mobile: row with points right-aligned) */}
+        <div className="flex items-center gap-2.5">
           <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full shadow-sm">
             <Image
               src={chef.imageUrl}
@@ -64,10 +64,22 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
               {ownerLabel}
             </span>
           </div>
+          {/* Points — visible on mobile inline, hidden on sm+ */}
+          <span
+            className={`ml-auto rounded-md px-3 py-1 font-mono text-sm font-bold sm:hidden ${
+              points > 0
+                ? 'bg-success/10 text-success'
+                : points < 0
+                ? 'bg-danger/10 text-danger'
+                : 'bg-stone-light/50 text-warm-gray'
+            }`}
+          >
+            {points > 0 ? '+' : ''}{points}
+          </span>
         </div>
 
         {/* Checkboxes */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <label className="flex cursor-pointer items-center gap-1.5 text-xs text-charcoal">
             <input
               type="checkbox"
@@ -115,8 +127,8 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
           </label>
         </div>
 
-        {/* Points */}
-        <div className="ml-auto">
+        {/* Points — hidden on mobile, visible on sm+ */}
+        <div className="ml-auto hidden sm:block">
           <span
             className={`rounded-md px-3 py-1 font-mono text-sm font-bold ${
               points > 0

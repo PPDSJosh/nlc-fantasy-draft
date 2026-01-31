@@ -133,7 +133,7 @@ function DraftableChef({
 
 export default function AvailableChefs({ chefs, onDraft, disabled, getDropTarget }: AvailableChefsProps) {
   return (
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-5">
+    <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5 sm:gap-2">
       {chefs.map((chef) => (
         <DraftableChef
           key={chef.id}

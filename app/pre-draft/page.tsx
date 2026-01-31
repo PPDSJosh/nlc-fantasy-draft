@@ -36,21 +36,22 @@ export default function PreDraftPage() {
   return (
     <div className="min-h-screen bg-cream">
       {/* Hero */}
-      <div className="bg-ink px-4 py-16 text-center">
+      <div className="bg-ink px-4 py-10 text-center sm:py-14 md:py-16">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
           Episode {currentEpisode} of 3
         </p>
-        <h1 className="mt-4 font-display text-4xl font-bold text-white sm:text-5xl">
+        <h1 className="mt-3 font-display text-3xl font-bold text-white sm:mt-4 sm:text-4xl md:text-5xl">
           Pre-Draft Eliminations
         </h1>
-        <div className="mt-6 flex items-center justify-center gap-8">
+
+        <div className="mt-5 flex items-center justify-center gap-6 sm:mt-6 sm:gap-8">
           <div className="text-center">
-            <p className="font-mono text-3xl font-bold text-danger">{eliminatedCount}</p>
+            <p className="font-mono text-2xl font-bold text-danger sm:text-3xl">{eliminatedCount}</p>
             <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white/30">Eliminated</p>
           </div>
-          <div className="h-10 w-px bg-white/10" />
+          <div className="h-8 w-px bg-white/10 sm:h-10" />
           <div className="text-center">
-            <p className="font-mono text-3xl font-bold text-success">{remainingCount}</p>
+            <p className="font-mono text-2xl font-bold text-success sm:text-3xl">{remainingCount}</p>
             <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white/30">Remaining</p>
           </div>
         </div>
@@ -92,7 +93,7 @@ export default function PreDraftPage() {
         </p>
 
         {/* Chef Grid */}
-        <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
           {chefs.map((chef) => (
             <ChefCard
               key={chef.id}

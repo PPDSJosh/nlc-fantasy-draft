@@ -51,7 +51,7 @@ export default function DraftBoard() {
   return (
     <div className="flex flex-col gap-8">
       {/* Current Pick Indicator */}
-      <div className="overflow-hidden rounded-lg bg-ink p-6 text-center">
+      <div className="overflow-hidden rounded-lg bg-ink p-4 text-center sm:p-6">
         {draftComplete ? (
           <span className="font-display text-2xl font-bold text-white">Draft Complete</span>
         ) : (

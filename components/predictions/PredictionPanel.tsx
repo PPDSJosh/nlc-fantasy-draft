@@ -115,21 +115,21 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
         Pick one of your chefs you think will survive, or skip.
       </p>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         {eligibleChefs.map((chef) => (
           <button
             key={chef.id}
             onClick={() => setSelectedChefId(chef.id)}
-            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-all ${
+            className={`flex items-center gap-2 rounded-xl border px-2.5 py-2 text-sm transition-all sm:px-3 ${
               selectedChefId === chef.id
                 ? 'border-ink bg-ink text-white shadow-md'
                 : 'border-stone-light/50 bg-white text-charcoal hover:border-stone'
             }`}
           >
-            <div className="relative h-7 w-7 overflow-hidden rounded-full shadow-sm">
+            <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full shadow-sm sm:h-7 sm:w-7">
               <Image src={chef.imageUrl} alt={chef.firstName} fill className="object-cover object-top" sizes="28px" />
             </div>
-            <span className="font-display text-sm">{chef.firstName}</span>
+            <span className="truncate font-display text-xs sm:text-sm">{chef.firstName}</span>
           </button>
         ))}
       </div>
@@ -138,7 +138,7 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
         <button
           onClick={handleLock}
           disabled={!selectedChefId}
-          className={`rounded-xl px-5 py-2 text-sm font-bold uppercase tracking-wider transition-all ${
+          className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all sm:flex-none sm:px-5 sm:py-2 sm:text-sm ${
             selectedChefId
               ? 'bg-ink text-white shadow-md hover:bg-charcoal'
               : 'cursor-not-allowed bg-stone-light text-warm-gray'
@@ -148,7 +148,7 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
         </button>
         <button
           onClick={handleSkip}
-          className="rounded-xl bg-cream-dark px-5 py-2 text-sm font-medium text-warm-gray transition-colors hover:bg-stone-light"
+          className="flex-1 rounded-xl bg-cream-dark px-4 py-2.5 text-xs font-medium text-warm-gray transition-colors hover:bg-stone-light sm:flex-none sm:px-5 sm:py-2 sm:text-sm"
         >
           Skip
         </button>
