@@ -43,7 +43,7 @@ export default function ScoringForm({
 
   const teamTotals = useMemo(() => {
     let joshTotal = 0;
-    let wifeTotal = 0;
+    let jazzyTotal = 0;
     let wildcardTotal = 0;
 
     for (const chef of activeChefs) {
@@ -51,17 +51,17 @@ export default function ScoringForm({
       if (!r) continue;
       const pts = calculatePoints(r);
       if (chef.owner === 'josh') joshTotal += pts;
-      else if (chef.owner === 'wife') wifeTotal += pts;
+      else if (chef.owner === 'wife') jazzyTotal += pts;
       else if (chef.owner === 'wildcard') wildcardTotal += pts;
     }
 
-    if (joshTotal <= wifeTotal) {
+    if (joshTotal <= jazzyTotal) {
       joshTotal += wildcardTotal;
     } else {
-      wifeTotal += wildcardTotal;
+      jazzyTotal += wildcardTotal;
     }
 
-    return { joshTotal, wifeTotal, wildcardTotal };
+    return { joshTotal, jazzyTotal, wildcardTotal };
   }, [results, activeChefs]);
 
   function handleSave() {
@@ -69,23 +69,23 @@ export default function ScoringForm({
   }
 
   const joshChefs = activeChefs.filter((c) => c.owner === 'josh');
-  const wifeChefs = activeChefs.filter((c) => c.owner === 'wife');
+  const jazzyChefs = activeChefs.filter((c) => c.owner === 'wife');
   const wildcardChefs = activeChefs.filter((c) => c.owner === 'wildcard');
 
   return (
     <div className="flex flex-col gap-6">
       {/* Team Totals */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl border border-josh/20 bg-josh-light p-5 text-center">
-          <p className="text-xs font-medium uppercase tracking-wider text-josh">Josh&apos;s Team</p>
-          <p className="font-display text-3xl font-bold text-josh">
+        <div className="rounded-2xl border border-josh/20 bg-josh/5 p-5 text-center">
+          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-josh">Josh&apos;s Team</p>
+          <p className="mt-1 font-display text-3xl font-bold text-josh">
             {teamTotals.joshTotal > 0 ? '+' : ''}{teamTotals.joshTotal}
           </p>
         </div>
-        <div className="rounded-xl border border-wife/20 bg-wife-light p-5 text-center">
-          <p className="text-xs font-medium uppercase tracking-wider text-wife">Wife&apos;s Team</p>
-          <p className="font-display text-3xl font-bold text-wife">
-            {teamTotals.wifeTotal > 0 ? '+' : ''}{teamTotals.wifeTotal}
+        <div className="rounded-2xl border border-jazzy/20 bg-jazzy/5 p-5 text-center">
+          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-jazzy">Jazzy&apos;s Team</p>
+          <p className="mt-1 font-display text-3xl font-bold text-jazzy">
+            {teamTotals.jazzyTotal > 0 ? '+' : ''}{teamTotals.jazzyTotal}
           </p>
         </div>
       </div>
@@ -93,13 +93,13 @@ export default function ScoringForm({
       {teamTotals.wildcardTotal !== 0 && (
         <p className="text-center text-xs text-gold">
           Wildcard ({teamTotals.wildcardTotal > 0 ? '+' : ''}{teamTotals.wildcardTotal} pts)
-          assigned to {teamTotals.joshTotal <= teamTotals.wifeTotal ? "Josh's" : "Wife's"} team
+          assigned to {teamTotals.joshTotal <= teamTotals.jazzyTotal ? "Josh's" : "Jazzy's"} team
         </p>
       )}
 
       {/* Josh's Chefs */}
       <div>
-        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-josh">Josh&apos;s Chefs</h3>
+        <h3 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-josh">Josh&apos;s Chefs</h3>
         <div className="flex flex-col gap-2">
           {joshChefs.map((chef) => (
             <ChefScoringRow
@@ -112,11 +112,11 @@ export default function ScoringForm({
         </div>
       </div>
 
-      {/* Wife's Chefs */}
+      {/* Jazzy's Chefs */}
       <div>
-        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-wife">Wife&apos;s Chefs</h3>
+        <h3 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-jazzy">Jazzy&apos;s Chefs</h3>
         <div className="flex flex-col gap-2">
-          {wifeChefs.map((chef) => (
+          {jazzyChefs.map((chef) => (
             <ChefScoringRow
               key={chef.id}
               chef={chef}
@@ -130,7 +130,7 @@ export default function ScoringForm({
       {/* Wildcard */}
       {wildcardChefs.length > 0 && (
         <div>
-          <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-gold">Wildcard</h3>
+          <h3 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-gold">Wildcard</h3>
           <div className="flex flex-col gap-2">
             {wildcardChefs.map((chef) => (
               <ChefScoringRow
@@ -149,7 +149,7 @@ export default function ScoringForm({
         <button
           onClick={handleSave}
           disabled={hasErrors}
-          className={`rounded-lg px-8 py-3 text-sm font-bold uppercase tracking-wider transition-all ${
+          className={`rounded-xl px-8 py-3 text-sm font-bold uppercase tracking-wider transition-all ${
             hasErrors
               ? 'cursor-not-allowed bg-stone-light text-warm-gray'
               : 'bg-ink text-white shadow-lg hover:bg-charcoal hover:shadow-xl'

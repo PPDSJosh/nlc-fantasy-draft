@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Chef } from '@/lib/data/chefs';
 import { useGameStore } from '@/lib/store/gameStore';
 
 interface PredictionPanelProps {
@@ -29,11 +28,11 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
   const isLocked = existingPrediction?.locked || false;
   const isResolved = existingPrediction?.correct !== null && existingPrediction?.correct !== undefined;
 
-  const playerLabel = player === 'josh' ? 'Josh' : 'Wife';
+  const playerLabel = player === 'josh' ? 'Josh' : 'Jazzy';
 
   const colorClasses = player === 'josh'
-    ? { text: 'text-josh', border: 'border-josh/20', bg: 'bg-josh-light', accent: 'bg-josh' }
-    : { text: 'text-wife', border: 'border-wife/20', bg: 'bg-wife-light', accent: 'bg-wife' };
+    ? { text: 'text-josh', border: 'border-josh/20', bg: 'bg-josh/5', accent: 'bg-josh' }
+    : { text: 'text-jazzy', border: 'border-jazzy/20', bg: 'bg-jazzy/5', accent: 'bg-jazzy' };
 
   function handleLock() {
     lockPrediction(episodeNumber, player, selectedChefId);
@@ -49,17 +48,17 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
   if (isResolved && existingPrediction) {
     const predChef = chefs.find((c) => c.id === existingPrediction.chefId);
     return (
-      <div className={`rounded-lg border p-4 ${
+      <div className={`rounded-xl border p-4 ${
         existingPrediction.correct ? 'border-success/30 bg-success/5' : 'border-danger/30 bg-danger/5'
       }`}>
-        <p className={`text-xs font-bold uppercase tracking-wider ${colorClasses.text}`}>
+        <p className={`text-[10px] font-bold uppercase tracking-[0.15em] ${colorClasses.text}`}>
           {playerLabel}&apos;s Prediction
         </p>
         {existingPrediction.chefId ? (
           <>
             <div className="mt-2 flex items-center gap-2">
               {predChef && (
-                <div className="relative h-7 w-7 overflow-hidden rounded-full bg-stone-light">
+                <div className="relative h-7 w-7 overflow-hidden rounded-full shadow-sm">
                   <Image src={predChef.imageUrl} alt={predChef.firstName} fill className="object-cover object-top" sizes="28px" />
                 </div>
               )}
@@ -82,14 +81,14 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
   if (isLocked && existingPrediction) {
     const predChef = chefs.find((c) => c.id === existingPrediction.chefId);
     return (
-      <div className="rounded-lg border border-gold/30 bg-gold-light p-4">
-        <p className={`text-xs font-bold uppercase tracking-wider ${colorClasses.text}`}>
+      <div className="rounded-xl border border-gold/30 bg-gold/5 p-4">
+        <p className={`text-[10px] font-bold uppercase tracking-[0.15em] ${colorClasses.text}`}>
           {playerLabel}&apos;s Prediction — Locked
         </p>
         {existingPrediction.chefId ? (
           <div className="mt-2 flex items-center gap-2">
             {predChef && (
-              <div className="relative h-7 w-7 overflow-hidden rounded-full bg-stone-light">
+              <div className="relative h-7 w-7 overflow-hidden rounded-full shadow-sm">
                 <Image src={predChef.imageUrl} alt={predChef.firstName} fill className="object-cover object-top" sizes="28px" />
               </div>
             )}
@@ -100,7 +99,7 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
         ) : (
           <p className="mt-1 text-sm text-warm-gray">Skipped</p>
         )}
-        <p className="mt-2 text-[10px] text-warm-gray">
+        <p className="mt-2 font-mono text-[10px] text-warm-gray">
           Locked at {new Date(existingPrediction.lockedAt!).toLocaleString()}
         </p>
       </div>
@@ -108,8 +107,8 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
   }
 
   return (
-    <div className={`rounded-lg border ${colorClasses.border} ${colorClasses.bg} p-4`}>
-      <p className={`text-xs font-bold uppercase tracking-wider ${colorClasses.text}`}>
+    <div className={`rounded-xl border ${colorClasses.border} ${colorClasses.bg} p-4`}>
+      <p className={`text-[10px] font-bold uppercase tracking-[0.15em] ${colorClasses.text}`}>
         {playerLabel}&apos;s Prediction
       </p>
       <p className="mt-1 text-xs text-warm-gray">
@@ -121,13 +120,13 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
           <button
             key={chef.id}
             onClick={() => setSelectedChefId(chef.id)}
-            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${
+            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-all ${
               selectedChefId === chef.id
                 ? 'border-ink bg-ink text-white shadow-md'
-                : 'border-stone-light bg-white text-charcoal hover:border-stone'
+                : 'border-stone-light/50 bg-white text-charcoal hover:border-stone'
             }`}
           >
-            <div className="relative h-7 w-7 overflow-hidden rounded-full bg-stone-light">
+            <div className="relative h-7 w-7 overflow-hidden rounded-full shadow-sm">
               <Image src={chef.imageUrl} alt={chef.firstName} fill className="object-cover object-top" sizes="28px" />
             </div>
             <span className="font-display text-sm">{chef.firstName}</span>
@@ -139,7 +138,7 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
         <button
           onClick={handleLock}
           disabled={!selectedChefId}
-          className={`rounded-lg px-5 py-2 text-sm font-bold uppercase tracking-wider transition-all ${
+          className={`rounded-xl px-5 py-2 text-sm font-bold uppercase tracking-wider transition-all ${
             selectedChefId
               ? 'bg-ink text-white shadow-md hover:bg-charcoal'
               : 'cursor-not-allowed bg-stone-light text-warm-gray'
@@ -149,7 +148,7 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
         </button>
         <button
           onClick={handleSkip}
-          className="rounded-lg bg-cream-dark px-5 py-2 text-sm font-medium text-warm-gray transition-colors hover:bg-stone-light"
+          className="rounded-xl bg-cream-dark px-5 py-2 text-sm font-medium text-warm-gray transition-colors hover:bg-stone-light"
         >
           Skip
         </button>

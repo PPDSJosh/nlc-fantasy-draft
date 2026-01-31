@@ -1,31 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --cream: #F5F0E8;
-  --cream-dark: #EDE6DB;
-  --charcoal: #1A1A1A;
-  --ink: #111111;
-  --warm-gray: #8A8479;
-  --stone: #C5BDB3;
-  --stone-light: #E0DAD2;
+  --cream: #FAF7F2;
+  --cream-dark: #F0EBE3;
+  --charcoal: #1C1C1C;
+  --ink: #0A0A0A;
+  --warm-gray: #7A7468;
+  --stone: #B8B0A6;
+  --stone-light: #D8D2C8;
 
-  --pro: #1E3A5F;
-  --pro-light: #E8EDF4;
-  --social: #6B2D5B;
-  --social-light: #F4E8F0;
-  --home: #2D5F3A;
-  --home-light: #E8F4EB;
+  --pro: #1A365D;
+  --pro-light: #E8EEF6;
+  --social: #7C2D5B;
+  --social-light: #F6E8F2;
+  --home: #1D5F35;
+  --home-light: #E6F4EC;
 
-  --josh: #4A6FA5;
-  --josh-light: #EEF2F8;
-  --wife: #C75B7A;
-  --wife-light: #FBF0F3;
+  --josh: #3D6EA5;
+  --josh-light: #ECF1F8;
+  --jazzy: #D4587A;
+  --jazzy-light: #FDF0F3;
 
-  --gold: #C5A55A;
-  --gold-light: #F8F3E6;
+  --gold: #C9A84C;
+  --gold-light: #FBF6E8;
 
-  --success: #2D7A4F;
-  --danger: #B93E3E;
+  --success: #22804A;
+  --danger: #C53030;
 
   --background: var(--cream);
   --foreground: var(--charcoal);
@@ -55,8 +55,8 @@
 
   --color-josh: var(--josh);
   --color-josh-light: var(--josh-light);
-  --color-wife: var(--wife);
-  --color-wife-light: var(--wife-light);
+  --color-jazzy: var(--jazzy);
+  --color-jazzy-light: var(--jazzy-light);
 
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
@@ -71,24 +71,15 @@ body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
 
-/* Serif heading utility */
 .font-display {
   font-family: var(--font-playfair), Georgia, 'Times New Roman', serif;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--cream);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--stone);
-  border-radius: 3px;
-}
+/* Smooth scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--stone); border-radius: 3px; }
 
-/* Selection */
 ::selection {
   background: var(--gold);
   color: var(--ink);

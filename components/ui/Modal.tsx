@@ -7,9 +7,10 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  size?: 'default' | 'large';
 }
 
-export default function Modal({ isOpen, onClose, children }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, size = 'default' }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isAnimating = useRef(false);
@@ -29,17 +30,16 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
 
     if (contentRef.current) {
       tl.to(contentRef.current, {
-        scale: 0.95,
-        y: 30,
+        scale: 0.96,
         opacity: 0,
-        duration: 0.25,
-        ease: 'power3.in',
+        duration: 0.2,
+        ease: 'power2.in',
       }, 0);
     }
     if (overlayRef.current) {
       tl.to(overlayRef.current, {
         opacity: 0,
-        duration: 0.25,
+        duration: 0.2,
         ease: 'power2.in',
       }, 0);
     }
@@ -61,12 +61,12 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
         gsap.fromTo(
           overlayRef.current,
           { opacity: 0 },
-          { opacity: 1, duration: 0.3, ease: 'power2.out' }
+          { opacity: 1, duration: 0.25, ease: 'power2.out' }
         );
         gsap.fromTo(
           contentRef.current,
-          { scale: 0.95, y: 30, opacity: 0 },
-          { scale: 1, y: 0, opacity: 1, duration: 0.4, ease: 'back.out(1.2)' }
+          { scale: 0.96, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.05 }
         );
       }
     }
@@ -89,19 +89,21 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
     animateClose();
   }
 
+  const maxW = size === 'large' ? 'max-w-3xl' : 'max-w-lg';
+
   return (
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/90 p-4 backdrop-blur-sm"
     >
       <div
         ref={contentRef}
-        className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-cream shadow-2xl"
+        className={`relative w-full ${maxW} overflow-hidden rounded-2xl bg-cream shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}
       >
         <button
           onClick={handleCloseClick}
-          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-ink/50 text-sm text-white backdrop-blur-sm transition-colors hover:bg-ink/70"
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-ink/40 text-sm text-white/80 backdrop-blur-sm transition-all hover:bg-ink/60 hover:text-white"
           aria-label="Close"
         >
           &#10005;

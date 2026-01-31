@@ -16,12 +16,6 @@ const TYPE_COLORS: Record<string, string> = {
   home: 'bg-home',
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  pro: 'PRO',
-  social: 'SOCIAL',
-  home: 'HOME',
-};
-
 interface AvailableChefsProps {
   chefs: Chef[];
   onDraft: (chefId: string) => void;
@@ -113,43 +107,25 @@ function DraftableChef({
     onDraft(chef.id);
   }
 
-  function handleMouseEnter() {
-    if (btnRef.current) {
-      gsap.to(btnRef.current, { scale: 1.05, duration: 0.15, ease: 'power2.out' });
-    }
-  }
-
-  function handleMouseLeave() {
-    if (btnRef.current) {
-      gsap.to(btnRef.current, { scale: 1, duration: 0.15, ease: 'power2.out' });
-    }
-  }
-
   return (
     <button
       ref={btnRef}
       onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       disabled={disabled}
-      className="flex flex-col items-center gap-1.5 rounded-lg bg-white p-2 shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] disabled:cursor-not-allowed disabled:opacity-50"
+      className="group flex flex-col items-center gap-1.5 rounded-xl p-2 transition-all hover:bg-white/60 disabled:cursor-not-allowed disabled:opacity-40"
     >
-      <div className="relative h-14 w-14 overflow-hidden rounded-full bg-stone-light">
+      <div className="relative h-14 w-14 overflow-hidden rounded-full shadow-md">
         <Image
           src={chef.imageUrl}
           alt={chef.firstName}
           fill
-          className="object-cover object-top"
+          className="object-cover object-top transition-transform duration-300 group-hover:scale-110"
           sizes="56px"
         />
+        <div className={`absolute bottom-0 left-0 right-0 h-[2px] ${TYPE_COLORS[chef.type]}`} />
       </div>
       <span className="font-display text-xs font-semibold text-charcoal">
         {chef.firstName}
-      </span>
-      <span
-        className={`rounded-sm px-1.5 py-0 text-[8px] font-bold uppercase tracking-widest text-white ${TYPE_COLORS[chef.type]}`}
-      >
-        {TYPE_LABELS[chef.type]}
       </span>
     </button>
   );

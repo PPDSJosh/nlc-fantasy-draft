@@ -25,15 +25,15 @@ export default function DraftPage() {
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Header */}
-      <div className="bg-ink px-4 py-12 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+      {/* Hero */}
+      <div className="bg-ink px-4 py-14 text-center">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
           Snake Draft
         </p>
-        <h1 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
+        <h1 className="mt-4 font-display text-4xl font-bold text-white sm:text-5xl">
           Fantasy Draft
         </h1>
-        <p className="mt-2 text-sm text-white/50">14 Picks + 1 Wildcard</p>
+        <p className="mt-3 text-sm text-white/30">14 Picks + 1 Wildcard</p>
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-10">

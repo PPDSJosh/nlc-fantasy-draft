@@ -27,12 +27,12 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
   const joshPrediction = predictions.find(
     (p) => p.episodeNumber === episodeNumber && p.player === 'josh'
   );
-  const wifePrediction = predictions.find(
+  const jazzyPrediction = predictions.find(
     (p) => p.episodeNumber === episodeNumber && p.player === 'wife'
   );
 
   const bothPredictionsLocked =
-    (joshPrediction?.locked && wifePrediction?.locked) || !!existingEpisode?.scored;
+    (joshPrediction?.locked && jazzyPrediction?.locked) || !!existingEpisode?.scored;
 
   function handleSave(results: EpisodeResult[]) {
     const survivedChefIds = results
@@ -47,15 +47,15 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Header */}
-      <div className="bg-ink px-4 py-12 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+      {/* Hero */}
+      <div className="bg-ink px-4 py-14 text-center">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
           Score Results
         </p>
-        <h1 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
+        <h1 className="mt-4 font-display text-4xl font-bold text-white sm:text-5xl">
           Episode {episodeNumber}
         </h1>
-        <p className="mt-2 text-sm text-white/50">
+        <p className="mt-3 text-sm text-white/30">
           {activeChefs.length} chefs competing
         </p>
       </div>
@@ -64,7 +64,7 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
         {/* Prediction Phase */}
         {!bothPredictionsLocked && (
           <div className="mb-8">
-            <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-warm-gray">Predictions</h2>
+            <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">Predictions</h2>
             <p className="mb-4 text-xs text-warm-gray">
               Each player: predict which of your chefs will survive. +3 if correct, -2 if wrong, 0 if skipped.
             </p>
@@ -86,7 +86,7 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
         {/* Scoring Form */}
         {bothPredictionsLocked && (
           <>
-            {(joshPrediction || wifePrediction) && (
+            {(joshPrediction || jazzyPrediction) && (
               <div className="mb-6 flex flex-col gap-2">
                 <PredictionPanel
                   episodeNumber={episodeNumber}

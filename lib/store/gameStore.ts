@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { Chef, CHEFS } from '../data/chefs';
 import { EpisodeResult } from '../data/scoring';
 
-// Snake draft order: Josh picks 1, Wife picks 2-3, Josh picks 4-5, etc.
+// Snake draft order: Josh picks 1, Jazzy picks 2-3, Josh picks 4-5, etc.
 const SNAKE_ORDER: ('josh' | 'wife')[] = [
   'josh', 'wife', 'wife', 'josh', 'josh', 'wife', 'wife',
   'josh', 'josh', 'wife', 'wife', 'josh', 'josh', 'wife'
@@ -18,28 +18,28 @@ export interface EpisodeData {
 export interface Prediction {
   episodeNumber: number;
   player: 'josh' | 'wife';
-  chefId: string | null; // null = skipped
+  chefId: string | null;
   locked: boolean;
-  lockedAt: string | null; // ISO timestamp
-  correct: boolean | null; // null = not yet resolved
+  lockedAt: string | null;
+  correct: boolean | null;
 }
 
-interface GameState {
+interface GameSnapshot {
   chefs: Chef[];
-  currentEpisode: number; // 1, 2, or 3 during pre-draft; 4+ during season
+  currentEpisode: number;
   phase: 'pre-draft' | 'draft' | 'season';
-
-  // Draft state
   draftOrder: ('josh' | 'wife')[];
   currentPick: number;
-  draftHistory: string[]; // ordered list of drafted chef IDs
-
-  // Episode state
+  draftHistory: string[];
   episodes: EpisodeData[];
-  seasonEpisode: number; // Tracks current season episode (starts at 4)
-
-  // Prediction state
+  seasonEpisode: number;
   predictions: Prediction[];
+}
+
+interface GameState extends GameSnapshot {
+  // Undo/redo (excluded from persistence)
+  _past: GameSnapshot[];
+  _future: GameSnapshot[];
 
   // Actions
   eliminateChef: (chefId: string, episode: number) => void;
@@ -60,8 +60,33 @@ interface GameState {
   lockPrediction: (episodeNumber: number, player: 'josh' | 'wife', chefId: string | null) => void;
   resolvePredictions: (episodeNumber: number, survivedChefIds: string[]) => void;
 
+  // Undo/redo
+  undo: () => void;
+  redo: () => void;
+
   // Game management
   resetGame: () => void;
+}
+
+function getSnapshot(state: GameState): GameSnapshot {
+  return {
+    chefs: state.chefs,
+    currentEpisode: state.currentEpisode,
+    phase: state.phase,
+    draftOrder: state.draftOrder,
+    currentPick: state.currentPick,
+    draftHistory: state.draftHistory,
+    episodes: state.episodes,
+    seasonEpisode: state.seasonEpisode,
+    predictions: state.predictions,
+  };
+}
+
+function pushHistory(state: GameState): Pick<GameState, '_past' | '_future'> {
+  return {
+    _past: [...state._past.slice(-49), getSnapshot(state)],
+    _future: [],
+  };
 }
 
 export const useGameStore = create<GameState>()(
@@ -71,19 +96,20 @@ export const useGameStore = create<GameState>()(
       currentEpisode: 1,
       phase: 'pre-draft',
 
-      // Draft state
       draftOrder: SNAKE_ORDER,
       currentPick: 0,
       draftHistory: [],
 
-      // Episode state
       episodes: [],
       seasonEpisode: 4,
 
-      // Prediction state
       predictions: [],
 
+      _past: [],
+      _future: [],
+
       eliminateChef: (chefId, episode) => set((state) => ({
+        ...pushHistory(state),
         chefs: state.chefs.map((chef) =>
           chef.id === chefId
             ? { ...chef, status: 'eliminated' as const, eliminatedEpisode: episode, eliminatedPreDraft: true }
@@ -92,6 +118,7 @@ export const useGameStore = create<GameState>()(
       })),
 
       restoreChef: (chefId) => set((state) => ({
+        ...pushHistory(state),
         chefs: state.chefs.map((chef) =>
           chef.id === chefId
             ? { ...chef, status: 'active' as const, eliminatedEpisode: null, eliminatedPreDraft: false }
@@ -100,15 +127,20 @@ export const useGameStore = create<GameState>()(
       })),
 
       advanceEpisode: () => set((state) => ({
+        ...pushHistory(state),
         currentEpisode: Math.min(state.currentEpisode + 1, 3),
       })),
 
-      startDraft: () => set({ phase: 'draft' }),
+      startDraft: () => set((state) => ({
+        ...pushHistory(state),
+        phase: 'draft',
+      })),
 
       draftChef: (chefId) => set((state) => {
         if (state.currentPick >= 14) return state;
         const owner = state.draftOrder[state.currentPick];
         return {
+          ...pushHistory(state),
           chefs: state.chefs.map((chef) =>
             chef.id === chefId ? { ...chef, owner } : chef
           ),
@@ -122,6 +154,7 @@ export const useGameStore = create<GameState>()(
         const lastDraftedId = state.draftHistory[state.draftHistory.length - 1];
 
         return {
+          ...pushHistory(state),
           chefs: state.chefs.map((chef) =>
             chef.id === lastDraftedId
               ? { ...chef, owner: 'undrafted' as const }
@@ -138,6 +171,7 @@ export const useGameStore = create<GameState>()(
         );
         if (remaining.length === 1) {
           return {
+            ...pushHistory(state),
             chefs: state.chefs.map((chef) =>
               chef.id === remaining[0].id
                 ? { ...chef, owner: 'wildcard' as const }
@@ -146,11 +180,10 @@ export const useGameStore = create<GameState>()(
             phase: 'season' as const,
           };
         }
-        return { phase: 'season' as const };
+        return { ...pushHistory(state), phase: 'season' as const };
       }),
 
       saveEpisode: (episodeNumber, results) => set((state) => {
-        // Update chef statuses based on results
         const eliminatedIds = results
           .filter((r) => r.eliminated)
           .map((r) => r.chefId);
@@ -166,7 +199,6 @@ export const useGameStore = create<GameState>()(
           return chef;
         });
 
-        // Replace or add episode data
         const existing = state.episodes.findIndex(
           (e) => e.episodeNumber === episodeNumber
         );
@@ -184,17 +216,18 @@ export const useGameStore = create<GameState>()(
         }
 
         return {
+          ...pushHistory(state),
           chefs: updatedChefs,
           episodes: updatedEpisodes,
         };
       }),
 
       advanceSeasonEpisode: () => set((state) => ({
+        ...pushHistory(state),
         seasonEpisode: state.seasonEpisode + 1,
       })),
 
       lockPrediction: (episodeNumber, player, chefId) => set((state) => {
-        // Check if prediction already exists for this player/episode
         const existing = state.predictions.findIndex(
           (p) => p.episodeNumber === episodeNumber && p.player === player
         );
@@ -209,26 +242,46 @@ export const useGameStore = create<GameState>()(
 
         const updated = [...state.predictions];
         if (existing >= 0) {
-          // Don't allow changing locked predictions
           if (state.predictions[existing].locked) return state;
           updated[existing] = prediction;
         } else {
           updated.push(prediction);
         }
 
-        return { predictions: updated };
+        return { ...pushHistory(state), predictions: updated };
       }),
 
       resolvePredictions: (episodeNumber, survivedChefIds) => set((state) => ({
+        ...pushHistory(state),
         predictions: state.predictions.map((p) => {
           if (p.episodeNumber !== episodeNumber) return p;
-          if (!p.chefId) return { ...p, correct: null }; // skipped
+          if (!p.chefId) return { ...p, correct: null };
           return {
             ...p,
             correct: survivedChefIds.includes(p.chefId),
           };
         }),
       })),
+
+      undo: () => set((state) => {
+        if (state._past.length === 0) return state;
+        const previous = state._past[state._past.length - 1];
+        return {
+          ...previous,
+          _past: state._past.slice(0, -1),
+          _future: [getSnapshot(state), ...state._future.slice(0, 49)],
+        };
+      }),
+
+      redo: () => set((state) => {
+        if (state._future.length === 0) return state;
+        const next = state._future[0];
+        return {
+          ...next,
+          _past: [...state._past, getSnapshot(state)],
+          _future: state._future.slice(1),
+        };
+      }),
 
       resetGame: () => set({
         chefs: CHEFS,
@@ -240,8 +293,18 @@ export const useGameStore = create<GameState>()(
         episodes: [],
         seasonEpisode: 4,
         predictions: [],
+        _past: [],
+        _future: [],
       }),
     }),
-    { name: 'nlc-fantasy-game' }
+    {
+      name: 'nlc-fantasy-game',
+      partialize: (state) => {
+        // Exclude undo/redo history from persistence
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _past, _future, ...rest } = state;
+        return rest;
+      },
+    }
   )
 );

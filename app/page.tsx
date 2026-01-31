@@ -8,11 +8,11 @@ import ChefModal from '@/components/chef/ChefModal';
 
 type FilterType = 'all' | 'pro' | 'social' | 'home';
 
-const FILTERS: { label: string; value: FilterType; color: string }[] = [
-  { label: 'All', value: 'all', color: 'bg-ink text-white' },
-  { label: 'Pro', value: 'pro', color: 'bg-pro text-white' },
-  { label: 'Social', value: 'social', color: 'bg-social text-white' },
-  { label: 'Home', value: 'home', color: 'bg-home text-white' },
+const FILTERS: { label: string; value: FilterType }[] = [
+  { label: 'All Chefs', value: 'all' },
+  { label: 'Pro', value: 'pro' },
+  { label: 'Social', value: 'social' },
+  { label: 'Home', value: 'home' },
 ];
 
 export default function Home() {
@@ -25,28 +25,30 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Hero Header */}
-      <div className="bg-ink px-4 py-16 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+      {/* Hero */}
+      <div className="bg-ink px-4 py-20 text-center">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
           Season 5
         </p>
-        <h1 className="mt-3 font-display text-4xl font-bold text-white sm:text-5xl">
+        <h1 className="mt-4 font-display text-5xl font-bold text-white sm:text-6xl lg:text-7xl">
           Next Level Chef
         </h1>
-        <p className="mt-2 text-sm text-white/50">Fantasy Draft</p>
+        <p className="mt-3 text-sm tracking-wide text-white/30">
+          Fantasy Draft
+        </p>
       </div>
 
       <div className="mx-auto max-w-6xl px-4 py-10">
         {/* Filter Tabs */}
-        <div className="mb-8 flex justify-center gap-2">
+        <div className="mb-10 flex justify-center gap-2">
           {FILTERS.map((f) => (
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className={`rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all ${
                 filter === f.value
-                  ? f.color + ' shadow-md'
-                  : 'bg-white text-warm-gray hover:bg-cream-dark'
+                  ? 'bg-ink text-white shadow-md'
+                  : 'bg-transparent text-warm-gray hover:text-charcoal'
               }`}
             >
               {f.label}
@@ -54,8 +56,8 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Chef Grid */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-5 lg:grid-cols-6">
+        {/* Chef Grid — 4 columns for bigger, more dramatic cards */}
+        <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
           {filteredChefs.map((chef) => (
             <ChefCard
               key={chef.id}

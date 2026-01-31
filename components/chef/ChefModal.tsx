@@ -24,7 +24,7 @@ const TYPE_LABELS: Record<Chef['type'], string> = {
 
 const OWNER_LABELS: Record<string, { label: string; color: string }> = {
   josh: { label: "Josh's Team", color: 'text-josh' },
-  wife: { label: "Wife's Team", color: 'text-wife' },
+  wife: { label: "Jazzy's Team", color: 'text-jazzy' },
   wildcard: { label: 'Wildcard', color: 'text-gold' },
   undrafted: { label: 'Undrafted', color: 'text-warm-gray' },
 };
@@ -42,11 +42,11 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
   const ownerInfo = OWNER_LABELS[chef.owner];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col">
-        {/* Hero image */}
+    <Modal isOpen={isOpen} onClose={onClose} size="large">
+      <div className="flex flex-col md:flex-row">
+        {/* Photo side */}
         <div
-          className={`relative aspect-[4/3] w-full overflow-hidden ${
+          className={`relative aspect-[3/4] w-full overflow-hidden md:aspect-auto md:w-2/5 md:min-h-[480px] ${
             isEliminated ? 'grayscale' : ''
           }`}
         >
@@ -55,63 +55,80 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
             alt={`${chef.firstName} ${chef.lastName}`}
             fill
             className="object-cover object-top"
-            sizes="(max-width: 768px) 100vw, 512px"
+            sizes="(max-width: 768px) 100vw, 400px"
             priority
           />
-          {/* Gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-ink/5" />
 
-          {/* Name overlay on image */}
-          <div className="absolute bottom-0 left-0 right-0 p-5">
-            <h2 className="font-display text-3xl font-bold text-white drop-shadow-lg">
-              {chef.firstName} {chef.lastName}
-            </h2>
+          {/* Type badge */}
+          <div className="absolute left-4 top-4 md:top-auto md:bottom-4">
+            <span
+              className={`rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-md ${TYPE_COLORS[chef.type]}`}
+            >
+              {TYPE_LABELS[chef.type]}
+            </span>
           </div>
 
           {isEliminated && (
-            <div className="absolute left-4 top-4">
-              <span className="rounded-sm bg-danger px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-lg">
-                Eliminated
-                {chef.eliminatedEpisode !== null && ` — EP ${chef.eliminatedEpisode}`}
+            <div className="absolute right-4 top-4 md:left-4 md:right-auto md:top-auto md:bottom-12">
+              <span className="rounded-sm bg-danger/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-md">
+                Eliminated{chef.eliminatedEpisode !== null && ` \u2014 EP ${chef.eliminatedEpisode}`}
               </span>
             </div>
           )}
         </div>
 
-        {/* Info section */}
-        <div className="flex flex-col gap-4 p-5">
-          {/* Type + Status row */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span
-                className={`rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white ${TYPE_COLORS[chef.type]}`}
-              >
+        {/* Content side */}
+        <div className="flex flex-1 flex-col justify-center p-6 sm:p-8 md:p-10">
+          <h2 className="font-display text-3xl font-bold text-charcoal sm:text-4xl">
+            {chef.firstName}
+          </h2>
+          <p className="font-display text-xl text-warm-gray sm:text-2xl">
+            {chef.lastName}
+          </p>
+
+          {/* Decorative divider */}
+          <div className="mt-5 h-[2px] w-12 bg-gold" />
+
+          {/* Bio */}
+          <p className="mt-5 text-sm leading-relaxed text-charcoal/70">
+            {chef.bio}
+          </p>
+
+          {/* Hometown */}
+          <p className="mt-3 text-xs text-warm-gray">
+            {chef.hometown}
+          </p>
+
+          {/* Meta grid */}
+          <div className="mt-8 grid grid-cols-2 gap-6">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
+                Type
+              </p>
+              <p className={`mt-1.5 text-sm font-semibold ${TYPE_TEXT[chef.type]}`}>
                 {TYPE_LABELS[chef.type]}
-              </span>
+              </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  isEliminated ? 'bg-danger' : 'bg-success'
-                }`}
-              />
-              <span className="text-xs font-medium text-warm-gray">
-                {isEliminated ? 'Eliminated' : 'Active'}
-              </span>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
+                Team
+              </p>
+              <p className={`mt-1.5 text-sm font-semibold ${ownerInfo.color}`}>
+                {ownerInfo.label}
+              </p>
             </div>
-          </div>
-
-          {/* Divider */}
-          <div className="h-px bg-stone-light" />
-
-          {/* Team info */}
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-warm-gray">
-              Team
-            </span>
-            <span className={`text-sm font-bold ${ownerInfo.color}`}>
-              {ownerInfo.label}
-            </span>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
+                Status
+              </p>
+              <div className="mt-1.5 flex items-center gap-2">
+                <span className={`h-2 w-2 rounded-full ${isEliminated ? 'bg-danger' : 'bg-success'}`} />
+                <span className="text-sm font-medium text-charcoal">
+                  {isEliminated ? 'Eliminated' : 'Active'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

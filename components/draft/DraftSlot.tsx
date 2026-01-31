@@ -18,22 +18,22 @@ interface DraftSlotProps {
 export default function DraftSlot({ pickNumber, chef, isActive }: DraftSlotProps) {
   return (
     <div
-      className={`flex items-center gap-3 rounded-lg border p-2.5 transition-all ${
+      className={`flex items-center gap-3 rounded-xl border p-2.5 transition-all ${
         isActive
-          ? 'border-gold bg-gold-light shadow-[0_0_0_1px_var(--gold)]'
+          ? 'border-gold bg-gold/10 shadow-[0_0_0_1px_var(--gold)]'
           : chef
-          ? 'border-stone-light bg-white'
-          : 'border-dashed border-stone bg-cream-dark/50'
+          ? 'border-stone-light/50 bg-white'
+          : 'border-dashed border-stone/30 bg-cream-dark/30'
       }`}
     >
       <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold ${
-        isActive ? 'bg-gold text-ink' : 'bg-charcoal/10 text-warm-gray'
+        isActive ? 'bg-gold text-ink' : 'bg-charcoal/5 text-warm-gray'
       }`}>
         {pickNumber}
       </span>
       {chef ? (
         <div className="flex items-center gap-2.5">
-          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-stone-light">
+          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
             <Image
               src={chef.imageUrl}
               alt={chef.firstName}
@@ -54,7 +54,7 @@ export default function DraftSlot({ pickNumber, chef, isActive }: DraftSlotProps
           </div>
         </div>
       ) : (
-        <span className="text-sm text-stone italic">
+        <span className="text-sm italic text-stone">
           {isActive ? 'Waiting for pick...' : 'Empty slot'}
         </span>
       )}

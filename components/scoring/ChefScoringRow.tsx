@@ -4,12 +4,6 @@ import Image from 'next/image';
 import { Chef } from '@/lib/data/chefs';
 import { EpisodeResult, calculatePoints, validateResult } from '@/lib/data/scoring';
 
-const TYPE_COLORS: Record<string, string> = {
-  pro: 'bg-pro',
-  social: 'bg-social',
-  home: 'bg-home',
-};
-
 interface ChefScoringRowProps {
   chef: Chef;
   result: EpisodeResult;
@@ -20,12 +14,12 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
   const points = calculatePoints(result);
   const errors = validateResult(result);
   const ownerLabel =
-    chef.owner === 'josh' ? 'Josh' : chef.owner === 'wife' ? 'Wife' : 'Wildcard';
+    chef.owner === 'josh' ? 'Josh' : chef.owner === 'wife' ? 'Jazzy' : 'Wildcard';
   const ownerColor =
     chef.owner === 'josh'
       ? 'text-josh'
       : chef.owner === 'wife'
-      ? 'text-wife'
+      ? 'text-jazzy'
       : 'text-gold';
 
   function handleCheck(field: keyof EpisodeResult, checked: boolean) {
@@ -49,11 +43,11 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
   }
 
   return (
-    <div className={`rounded-lg border p-3 ${errors.length > 0 ? 'border-danger/40 bg-danger/5' : 'border-stone-light bg-white'}`}>
+    <div className={`rounded-xl border p-3 transition-colors ${errors.length > 0 ? 'border-danger/30 bg-danger/5' : 'border-stone-light/50 bg-white'}`}>
       <div className="flex flex-wrap items-center gap-3">
         {/* Chef info */}
-        <div className="flex items-center gap-2.5 min-w-[140px]">
-          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-stone-light">
+        <div className="flex min-w-[140px] items-center gap-2.5">
+          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full shadow-sm">
             <Image
               src={chef.imageUrl}
               alt={chef.firstName}
@@ -66,7 +60,7 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
             <span className="font-display text-sm font-semibold text-charcoal">
               {chef.firstName} {chef.lastName}
             </span>
-            <span className={`text-xs font-medium ${ownerColor}`}>
+            <span className={`text-[10px] font-bold ${ownerColor}`}>
               {ownerLabel}
             </span>
           </div>
@@ -74,7 +68,7 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
 
         {/* Checkboxes */}
         <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-1.5 text-xs text-charcoal">
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-charcoal">
             <input
               type="checkbox"
               checked={result.survived}
@@ -83,7 +77,7 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
             />
             Survived
           </label>
-          <label className="flex items-center gap-1.5 text-xs text-charcoal">
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-charcoal">
             <input
               type="checkbox"
               checked={result.wonChallenge}
@@ -92,7 +86,7 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
             />
             Won
           </label>
-          <label className="flex items-center gap-1.5 text-xs text-charcoal">
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-charcoal">
             <input
               type="checkbox"
               checked={result.topKitchen}
@@ -101,7 +95,7 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
             />
             Top Kitchen
           </label>
-          <label className="flex items-center gap-1.5 text-xs text-charcoal">
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-charcoal">
             <input
               type="checkbox"
               checked={result.bottom3}
@@ -110,7 +104,7 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
             />
             Bottom 3
           </label>
-          <label className="flex items-center gap-1.5 text-xs text-charcoal">
+          <label className="flex cursor-pointer items-center gap-1.5 text-xs text-charcoal">
             <input
               type="checkbox"
               checked={result.eliminated}
@@ -124,12 +118,12 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
         {/* Points */}
         <div className="ml-auto">
           <span
-            className={`rounded-sm px-3 py-1 font-mono text-sm font-bold ${
+            className={`rounded-md px-3 py-1 font-mono text-sm font-bold ${
               points > 0
                 ? 'bg-success/10 text-success'
                 : points < 0
                 ? 'bg-danger/10 text-danger'
-                : 'bg-stone-light text-warm-gray'
+                : 'bg-stone-light/50 text-warm-gray'
             }`}
           >
             {points > 0 ? '+' : ''}{points}
