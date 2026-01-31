@@ -51,7 +51,7 @@ export default function DraftBoard() {
   return (
     <div className="flex flex-col gap-8">
       {/* Current Pick Indicator */}
-      <div className="overflow-hidden rounded-2xl bg-ink p-6 text-center">
+      <div className="overflow-hidden rounded-lg bg-ink p-6 text-center">
         {draftComplete ? (
           <span className="font-display text-2xl font-bold text-white">Draft Complete</span>
         ) : (
@@ -86,7 +86,7 @@ export default function DraftBoard() {
 
       {/* Wildcard */}
       {draftComplete && availableChefs.length === 1 && !wildcardChef && (
-        <div className="overflow-hidden rounded-2xl border-2 border-gold/30 bg-gold/5 p-6 text-center">
+        <div className="overflow-hidden rounded-lg border-2 border-gold/30 bg-gold/5 p-6 text-center">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">
             Wildcard
           </p>
@@ -103,7 +103,7 @@ export default function DraftBoard() {
       )}
 
       {wildcardChef && (
-        <div className="overflow-hidden rounded-2xl border-2 border-gold/30 bg-gold/5 p-6 text-center">
+        <div className="overflow-hidden rounded-lg border-2 border-gold/30 bg-gold/5 p-6 text-center">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">
             Wildcard
           </p>
@@ -122,7 +122,7 @@ export default function DraftBoard() {
       {/* Team Columns */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Josh's Team */}
-        <div ref={joshDropRef} className="rounded-2xl border border-josh/20 bg-white p-4 transition-colors">
+        <div ref={joshDropRef} className="rounded-lg border border-josh/20 bg-white p-4 transition-colors">
           <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold text-josh">
             <span className="h-3 w-3 rounded-full bg-josh" />
             Josh&apos;s Team
@@ -144,7 +144,7 @@ export default function DraftBoard() {
         </div>
 
         {/* Jazzy's Team */}
-        <div ref={jazzyDropRef} className="rounded-2xl border border-jazzy/20 bg-white p-4 transition-colors">
+        <div ref={jazzyDropRef} className="rounded-lg border border-jazzy/20 bg-white p-4 transition-colors">
           <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold text-jazzy">
             <span className="h-3 w-3 rounded-full bg-jazzy" />
             Jazzy&apos;s Team

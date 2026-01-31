@@ -99,7 +99,7 @@ export default function Modal({ isOpen, onClose, children, size = 'default' }: M
     >
       <div
         ref={contentRef}
-        className={`relative w-full ${maxW} overflow-hidden rounded-2xl bg-cream shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}
+        className={`relative w-full ${maxW} overflow-hidden rounded-xl bg-cream shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}
       >
         <button
           onClick={handleCloseClick}

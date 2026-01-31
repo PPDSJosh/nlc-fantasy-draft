@@ -5,7 +5,7 @@ import { Chef } from '@/lib/data/chefs';
 import { useGameStore } from '@/lib/store/gameStore';
 import Modal from '@/components/ui/Modal';
 
-const TYPE_COLORS: Record<Chef['type'], string> = {
+const TYPE_BG: Record<Chef['type'], string> = {
   pro: 'bg-pro',
   social: 'bg-social',
   home: 'bg-home',
@@ -38,7 +38,6 @@ interface ChefModalProps {
 
 export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
   const toggleChefStatus = useGameStore((s) => s.toggleChefStatus);
-  const phase = useGameStore((s) => s.phase);
 
   if (!chef) return null;
 
@@ -50,7 +49,7 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
       <div className="flex flex-col md:flex-row">
         {/* Photo side */}
         <div
-          className={`relative aspect-[3/4] w-full overflow-hidden md:aspect-auto md:w-2/5 md:min-h-[480px] ${
+          className={`relative aspect-[3/4] w-full overflow-hidden md:aspect-auto md:w-2/5 md:min-h-[520px] ${
             isEliminated ? 'grayscale' : ''
           }`}
         >
@@ -62,20 +61,20 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
             sizes="(max-width: 768px) 100vw, 400px"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-ink/5" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-ink/10 md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-ink/5" />
 
           {/* Type badge */}
-          <div className="absolute left-4 top-4 md:top-auto md:bottom-4">
+          <div className="absolute left-4 top-4 md:bottom-4 md:top-auto">
             <span
-              className={`rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-md ${TYPE_COLORS[chef.type]}`}
+              className={`rounded-[3px] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.15em] text-white shadow-md ${TYPE_BG[chef.type]}`}
             >
               {TYPE_LABELS[chef.type]}
             </span>
           </div>
 
           {isEliminated && (
-            <div className="absolute right-4 top-4 md:left-4 md:right-auto md:top-auto md:bottom-12">
-              <span className="rounded-sm bg-danger/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-md">
+            <div className="absolute right-4 top-4 md:bottom-12 md:left-4 md:right-auto md:top-auto">
+              <span className="rounded-[3px] bg-danger/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.15em] text-white shadow-md">
                 Eliminated{chef.eliminatedEpisode !== null && ` \u2014 EP ${chef.eliminatedEpisode}`}
               </span>
             </div>
@@ -84,53 +83,58 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
 
         {/* Content side */}
         <div className="flex flex-1 flex-col justify-center p-6 sm:p-8 md:p-10">
-          <h2 className="font-display text-3xl font-bold text-charcoal sm:text-4xl">
+          <h2 className="font-display text-4xl font-bold leading-none text-charcoal sm:text-5xl">
             {chef.firstName}
           </h2>
-          <p className="font-display text-xl text-warm-gray sm:text-2xl">
+          <p className="mt-1 font-display text-xl text-warm-gray sm:text-2xl">
             {chef.lastName}
           </p>
 
-          {/* Decorative divider */}
-          <div className="mt-5 h-[2px] w-12 bg-gold" />
+          {/* Gold rule */}
+          <div className="mt-6 h-[2px] w-16 bg-gold" />
 
           {/* Bio */}
-          <p className="mt-5 text-sm leading-relaxed text-charcoal/70">
+          <p className="mt-6 text-sm leading-relaxed text-charcoal/70">
             {chef.bio}
           </p>
 
           {/* Hometown */}
-          <p className="mt-3 text-xs text-warm-gray">
+          <p className="mt-2 text-xs tracking-wide text-warm-gray">
             {chef.hometown}
           </p>
 
-          {/* Meta grid */}
-          <div className="mt-8 grid grid-cols-2 gap-6">
+          {/* Thin rule */}
+          <div className="mt-6 h-px w-full bg-stone-light/50" />
+
+          {/* Meta grid — 3 columns */}
+          <div className="mt-6 grid grid-cols-3 gap-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-warm-gray">
                 Type
               </p>
-              <p className={`mt-1.5 text-sm font-semibold ${TYPE_TEXT[chef.type]}`}>
-                {TYPE_LABELS[chef.type]}
-              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <span className={`h-2 w-2 rounded-full ${TYPE_BG[chef.type]}`} />
+                <p className={`text-sm font-semibold ${TYPE_TEXT[chef.type]}`}>
+                  {chef.type.charAt(0).toUpperCase() + chef.type.slice(1)}
+                </p>
+              </div>
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-warm-gray">
                 Team
               </p>
-              <p className={`mt-1.5 text-sm font-semibold ${ownerInfo.color}`}>
+              <p className={`mt-2 text-sm font-semibold ${ownerInfo.color}`}>
                 {ownerInfo.label}
               </p>
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-warm-gray">
                 Status
               </p>
               <button
                 onClick={() => toggleChefStatus(chef.id)}
-                className="mt-1.5 flex items-center gap-2.5 group/toggle"
+                className="mt-2 flex items-center gap-2 group/toggle"
               >
-                {/* Toggle track */}
                 <span
                   className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200 ${
                     isEliminated ? 'bg-danger/80' : 'bg-success/80'
@@ -142,12 +146,10 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
                     }`}
                   />
                 </span>
-                <span className={`text-sm font-medium transition-colors ${
-                  isEliminated
-                    ? 'text-danger group-hover/toggle:text-danger/70'
-                    : 'text-charcoal group-hover/toggle:text-charcoal/70'
+                <span className={`text-sm font-medium ${
+                  isEliminated ? 'text-danger' : 'text-charcoal'
                 }`}>
-                  {isEliminated ? 'Eliminated' : 'Active'}
+                  {isEliminated ? 'Out' : 'Active'}
                 </span>
               </button>
             </div>

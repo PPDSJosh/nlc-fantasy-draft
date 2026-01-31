@@ -38,14 +38,17 @@ export default function Home() {
         </p>
       </div>
 
+      {/* Gold accent line */}
+      <div className="h-[3px] bg-gold" />
+
       <div className="mx-auto max-w-6xl px-4 py-10">
         {/* Filter Tabs */}
-        <div className="mb-10 flex justify-center gap-2">
+        <div className="mb-10 flex justify-center gap-1">
           {FILTERS.map((f) => (
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className={`rounded-full px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`rounded-lg px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all ${
                 filter === f.value
                   ? 'bg-ink text-white shadow-md'
                   : 'bg-transparent text-warm-gray hover:text-charcoal'
@@ -56,8 +59,8 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Chef Grid — 4 columns for bigger, more dramatic cards */}
-        <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+        {/* Chef Grid */}
+        <div className="grid grid-cols-2 gap-5 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
           {filteredChefs.map((chef) => (
             <ChefCard
               key={chef.id}

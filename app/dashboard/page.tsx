@@ -124,17 +124,17 @@ export default function DashboardPage() {
           {episodes.length} episode{episodes.length !== 1 ? 's' : ''} scored
         </p>
 
-        {/* Season Totals */}
-        <div className="mx-auto mt-12 grid max-w-md grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-josh/30 bg-josh/10 p-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-josh">Josh</p>
+        {/* Season Totals — solid colored backgrounds */}
+        <div className="mx-auto mt-12 grid max-w-md grid-cols-2 gap-4">
+          <div className="rounded-lg bg-josh p-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Josh</p>
             <p className="mt-2 font-display text-5xl font-bold text-white"><CountUp value={stats.joshSeasonTotal} /></p>
-            <p className="mt-1 font-mono text-xs text-josh/60">{stats.joshWins} wins</p>
+            <p className="mt-1 font-mono text-xs text-white/40">{stats.joshWins} wins</p>
           </div>
-          <div className="rounded-2xl border border-jazzy/30 bg-jazzy/10 p-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-jazzy">Jazzy</p>
+          <div className="rounded-lg bg-jazzy p-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Jazzy</p>
             <p className="mt-2 font-display text-5xl font-bold text-white"><CountUp value={stats.jazzySeasonTotal} /></p>
-            <p className="mt-1 font-mono text-xs text-jazzy/60">{stats.jazzyWins} wins</p>
+            <p className="mt-1 font-mono text-xs text-white/40">{stats.jazzyWins} wins</p>
           </div>
         </div>
       </div>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
           const jazzyLine = stats.episodeScores.map((ep, i) => `${x(i)},${y(ep.jazzyCumulative)}`).join(' ');
 
           return (
-            <div className="mb-8 overflow-hidden rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+            <div className="mb-8 overflow-hidden rounded-lg bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">Score Progression</h2>
               <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" preserveAspectRatio="xMidYMid meet">
                 {[0, 0.25, 0.5, 0.75, 1].map((frac) => {
@@ -199,20 +199,20 @@ export default function DashboardPage() {
         })()}
 
         {/* Top Performers */}
-        <div className="mb-8 overflow-hidden rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+        <div className="mb-8 overflow-hidden rounded-lg bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
           <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">Top Performers</h2>
           {stats.topPerformers.length === 0 ? (
             <p className="text-sm text-stone">No episodes scored yet</p>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               {stats.topPerformers.map((perf, i) => (
                 <div
                   key={perf.chefId}
-                  className="flex items-center justify-between rounded-xl border border-stone-light/30 px-3 py-2.5"
+                  className="flex items-center justify-between rounded-lg border border-stone-light/30 px-3 py-2.5"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-charcoal/5 font-mono text-[10px] font-bold text-warm-gray">
-                      {i + 1}
+                    <span className="flex h-6 w-6 items-center justify-center font-mono text-[11px] font-bold text-warm-gray">
+                      {String(i + 1).padStart(2, '0')}
                     </span>
                     <div className="relative h-8 w-8 overflow-hidden rounded-full shadow-sm">
                       <Image src={perf.imageUrl} alt={perf.firstName} fill className="object-cover object-top" sizes="32px" />
@@ -221,7 +221,7 @@ export default function DashboardPage() {
                       {perf.firstName} {perf.lastName}
                     </span>
                     <span
-                      className={`text-[10px] font-bold uppercase tracking-wider ${
+                      className={`text-[9px] font-bold uppercase tracking-wider ${
                         perf.owner === 'josh'
                           ? 'text-josh'
                           : perf.owner === 'wife'
@@ -249,37 +249,57 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Episode History */}
-        <div className="mb-8 overflow-hidden rounded-2xl bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+        {/* Episode History — structured SmartConnect-style */}
+        <div className="mb-8">
           <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">Episode History</h2>
           {stats.episodeScores.length === 0 ? (
-            <p className="text-sm text-stone">No episodes scored yet</p>
+            <div className="rounded-lg bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+              <p className="text-sm text-stone">No episodes scored yet</p>
+            </div>
           ) : (
             <div className="flex flex-col gap-2">
               {stats.episodeScores.map((ep) => (
                 <Link
                   key={ep.episodeNumber}
                   href={`/episode/${ep.episodeNumber}`}
-                  className="flex items-center justify-between rounded-xl border border-stone-light/30 px-4 py-3 transition-all hover:bg-cream-dark hover:shadow-sm"
+                  className="group flex items-stretch overflow-hidden rounded-lg transition-all hover:shadow-md"
                 >
-                  <span className="font-display text-sm font-semibold text-charcoal">
-                    Episode {ep.episodeNumber}
-                  </span>
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono text-sm font-bold text-josh">
-                      {ep.joshScore > 0 ? '+' : ''}{ep.joshScore}
-                    </span>
-                    <span className="font-mono text-sm font-bold text-jazzy">
-                      {ep.jazzyScore > 0 ? '+' : ''}{ep.jazzyScore}
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-warm-gray">
-                      {ep.joshScore > ep.jazzyScore
-                        ? 'Josh'
-                        : ep.jazzyScore > ep.joshScore
-                        ? 'Jazzy'
-                        : 'Tie'}
+                  {/* Episode number — dark block */}
+                  <div className="flex w-16 shrink-0 flex-col items-center justify-center bg-ink py-3">
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-white/30">EP</span>
+                    <span className="font-display text-xl font-bold text-white">
+                      {String(ep.episodeNumber).padStart(2, '0')}
                     </span>
                   </div>
+
+                  {/* Scores */}
+                  <div className="flex flex-1 items-center justify-between bg-white px-5 py-3">
+                    <div className="flex items-center gap-5">
+                      <div className="text-center">
+                        <span className="block text-[9px] font-bold uppercase tracking-wider text-josh/50">Josh</span>
+                        <span className="font-mono text-sm font-bold text-josh">
+                          {ep.joshScore > 0 ? '+' : ''}{ep.joshScore}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-stone-light">vs</span>
+                      <div className="text-center">
+                        <span className="block text-[9px] font-bold uppercase tracking-wider text-jazzy/50">Jazzy</span>
+                        <span className="font-mono text-sm font-bold text-jazzy">
+                          {ep.jazzyScore > 0 ? '+' : ''}{ep.jazzyScore}
+                        </span>
+                      </div>
+                    </div>
+                    <span className={`rounded-[3px] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white ${
+                      ep.joshScore > ep.jazzyScore ? 'bg-josh' : ep.jazzyScore > ep.joshScore ? 'bg-jazzy' : 'bg-warm-gray'
+                    }`}>
+                      {ep.joshScore > ep.jazzyScore ? 'Josh' : ep.jazzyScore > ep.joshScore ? 'Jazzy' : 'Tie'}
+                    </span>
+                  </div>
+
+                  {/* Right accent bar */}
+                  <div className={`w-1 shrink-0 ${
+                    ep.joshScore > ep.jazzyScore ? 'bg-josh' : ep.jazzyScore > ep.joshScore ? 'bg-jazzy' : 'bg-gold'
+                  }`} />
                 </Link>
               ))}
             </div>
@@ -290,13 +310,13 @@ export default function DashboardPage() {
         <div className="flex justify-center gap-3">
           <Link
             href={`/episode/${seasonEpisode}`}
-            className="rounded-xl bg-ink px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl"
+            className="rounded-lg bg-ink px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl"
           >
             Score Episode {seasonEpisode}
           </Link>
           <Link
             href="/"
-            className="rounded-xl bg-white px-6 py-2.5 text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg"
+            className="rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg"
           >
             View All Chefs
           </Link>
