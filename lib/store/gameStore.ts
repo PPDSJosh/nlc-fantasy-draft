@@ -56,6 +56,9 @@ interface GameState extends GameSnapshot {
   saveEpisode: (episodeNumber: number, results: EpisodeResult[]) => void;
   advanceSeasonEpisode: () => void;
 
+  // Season elimination toggle
+  toggleChefStatus: (chefId: string) => void;
+
   // Prediction actions
   lockPrediction: (episodeNumber: number, player: 'josh' | 'wife', chefId: string | null) => void;
   resolvePredictions: (episodeNumber: number, survivedChefIds: string[]) => void;
@@ -181,6 +184,31 @@ export const useGameStore = create<GameState>()(
           };
         }
         return { ...pushHistory(state), phase: 'season' as const };
+      }),
+
+      toggleChefStatus: (chefId) => set((state) => {
+        const chef = state.chefs.find((c) => c.id === chefId);
+        if (!chef) return state;
+
+        if (chef.status === 'active') {
+          return {
+            ...pushHistory(state),
+            chefs: state.chefs.map((c) =>
+              c.id === chefId
+                ? { ...c, status: 'eliminated' as const, eliminatedEpisode: state.seasonEpisode }
+                : c
+            ),
+          };
+        } else {
+          return {
+            ...pushHistory(state),
+            chefs: state.chefs.map((c) =>
+              c.id === chefId
+                ? { ...c, status: 'active' as const, eliminatedEpisode: null }
+                : c
+            ),
+          };
+        }
       }),
 
       saveEpisode: (episodeNumber, results) => set((state) => {
