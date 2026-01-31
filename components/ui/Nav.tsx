@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useGameStore } from '@/lib/store/gameStore';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function Nav() {
   const pathname = usePathname();
   const { phase, resetGame, undo, redo, _past, _future } = useGameStore();
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -25,10 +27,12 @@ export default function Nav() {
   }, [undo, redo]);
 
   function handleReset() {
-    if (window.confirm('Reset all game data? This cannot be undone.')) {
-      resetGame();
-      window.location.href = '/';
-    }
+    setShowResetConfirm(true);
+  }
+
+  function confirmReset() {
+    resetGame();
+    window.location.href = '/';
   }
 
   const links = [
@@ -108,6 +112,17 @@ export default function Nav() {
           </Link>
         ))}
       </div>
+
+      <ConfirmDialog
+        isOpen={showResetConfirm}
+        title="Reset Game"
+        message="This will erase all draft picks, scores, and predictions. This cannot be undone."
+        confirmLabel="Reset Everything"
+        cancelLabel="Keep Playing"
+        destructive
+        onConfirm={confirmReset}
+        onCancel={() => setShowResetConfirm(false)}
+      />
     </nav>
   );
 }
