@@ -14,6 +14,8 @@ const CREDENTIALS = [
   },
 ];
 
+const APP_URL = 'https://nlc-fantasy-draft.vercel.app';
+
 function buildEmailHtml(name: string, email: string, password: string): string {
   return `
 <!DOCTYPE html>
@@ -60,6 +62,13 @@ function buildEmailHtml(name: string, email: string, password: string): string {
         <p style="margin:0; font-size:16px; color:#1C1C1C;">
           <strong>Password:</strong> <code style="background:#F0EBE3; padding:2px 8px; border-radius:4px; font-family:monospace; font-size:15px;">${password}</code>
         </p>
+      </div>
+
+      <!-- CTA Button -->
+      <div style="text-align:center; margin-bottom:24px;">
+        <a href="${APP_URL}/login" style="display:inline-block; background-color:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; text-decoration:none; padding:14px 32px; border-radius:8px;">
+          Open Draft App
+        </a>
       </div>
 
       <p style="margin:0; font-size:14px; color:#7A7468; line-height:1.5;">
