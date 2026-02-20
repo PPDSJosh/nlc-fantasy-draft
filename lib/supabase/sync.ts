@@ -1,4 +1,4 @@
-import { supabase } from './client';
+import { getSupabase } from './client';
 import { useSyncStatus } from '@/lib/hooks/useSyncStatus';
 import type { GameSnapshot, Prediction, RemoteGameStatePayload, RemotePredictionPayload } from '../store/gameStore';
 
@@ -18,7 +18,7 @@ export function writeGameState(snapshot: GameSnapshot, player: string) {
   _gameStateTimer = setTimeout(async () => {
     _isSyncing = true;
     try {
-      const { error } = await supabase
+      const { error } = await getSupabase()
         .from('game_state')
         .upsert({
           id: 'singleton',
@@ -49,7 +49,7 @@ export function writeGameState(snapshot: GameSnapshot, player: string) {
 export async function writePrediction(prediction: Prediction) {
   _isSyncing = true;
   try {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('predictions')
       .upsert(
         {
@@ -80,8 +80,8 @@ export async function fetchInitialState(): Promise<{
   predictions: RemotePredictionPayload[];
 }> {
   const [gsResult, predResult] = await Promise.all([
-    supabase.from('game_state').select('*').eq('id', 'singleton').single(),
-    supabase.from('predictions').select('*').order('episode_number'),
+    getSupabase().from('game_state').select('*').eq('id', 'singleton').single(),
+    getSupabase().from('predictions').select('*').order('episode_number'),
   ]);
 
   let gameState: RemoteGameStatePayload | null = null;

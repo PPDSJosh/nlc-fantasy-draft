@@ -6,7 +6,7 @@ import { useGameStore, getSnapshot } from '@/lib/store/gameStore';
 import type { GameSnapshot, Prediction, RemoteGameStatePayload, RemotePredictionPayload } from '@/lib/store/gameStore';
 import type { Chef } from '@/lib/data/chefs';
 import { writeGameState, writePrediction, isSyncing, fetchInitialState } from '@/lib/supabase/sync';
-import { supabase } from '@/lib/supabase/client';
+import { getSupabase } from '@/lib/supabase/client';
 import { useSyncStatus } from '@/lib/hooks/useSyncStatus';
 import { toast } from '@/components/ui/Toast';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
@@ -237,7 +237,8 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
     const { setConnected, setOpponentOnline } = useSyncStatus.getState();
 
     // ── Data sync channel ────────────────────────────────────────────
-    const syncChannel = supabase
+    const sb = getSupabase();
+    const syncChannel = sb
       .channel('sync')
       .on<Record<string, unknown>>(
         'postgres_changes',
@@ -314,7 +315,7 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
       });
 
     // ── Presence channel ─────────────────────────────────────────────
-    const presenceChannel = supabase
+    const presenceChannel = sb
       .channel('presence')
       .on('presence', { event: 'sync' }, () => {
         const state = presenceChannel.presenceState();
@@ -332,8 +333,8 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
       });
 
     return () => {
-      supabase.removeChannel(syncChannel);
-      supabase.removeChannel(presenceChannel);
+      sb.removeChannel(syncChannel);
+      sb.removeChannel(presenceChannel);
     };
   }, [user]);
 
