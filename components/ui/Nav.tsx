@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useGameStore } from '@/lib/store/gameStore';
+import { useAuth } from '@/components/auth/AuthProvider';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function Nav() {
   const pathname = usePathname();
   const { phase, resetGame, undo, redo, _past, _future } = useGameStore();
+  const { user, logout } = useAuth();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   useEffect(() => {
@@ -25,6 +27,9 @@ export default function Nav() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
+
+  // Don't show nav on login page
+  if (pathname === '/login') return null;
 
   function handleReset() {
     setShowResetConfirm(true);
@@ -88,6 +93,26 @@ export default function Nav() {
           <span className="rounded-full bg-white/5 px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-widest text-white/30">
             {phase}
           </span>
+
+          {/* Current user indicator */}
+          {user && (
+            <>
+              <span className="mx-1 h-4 w-px bg-white/10" />
+              <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white ${
+                user.player === 'josh' ? 'bg-josh/80' : 'bg-jazzy/80'
+              }`}>
+                {user.displayName}
+              </span>
+              <button
+                onClick={logout}
+                className="text-[10px] font-medium uppercase tracking-wider text-white/20 transition-colors hover:text-white/60"
+              >
+                Logout
+              </button>
+            </>
+          )}
+
+          <span className="mx-1 h-4 w-px bg-white/10" />
           <button
             onClick={handleReset}
             className="text-[10px] font-medium uppercase tracking-wider text-white/20 transition-colors hover:text-danger"
@@ -111,6 +136,23 @@ export default function Nav() {
             {link.label}
           </Link>
         ))}
+        {/* Mobile user indicator */}
+        {user && (
+          <>
+            <span className="mx-0.5 h-3 w-px bg-white/10" />
+            <span className={`rounded-full px-2 py-1 text-[10px] font-bold text-white ${
+              user.player === 'josh' ? 'bg-josh/80' : 'bg-jazzy/80'
+            }`}>
+              {user.displayName}
+            </span>
+            <button
+              onClick={logout}
+              className="rounded-lg px-2 py-1.5 text-[10px] text-white/30"
+            >
+              Out
+            </button>
+          </>
+        )}
       </div>
 
       <ConfirmDialog
