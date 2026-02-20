@@ -24,7 +24,7 @@ export interface Prediction {
   correct: boolean | null;
 }
 
-interface GameSnapshot {
+export interface GameSnapshot {
   chefs: Chef[];
   currentEpisode: number;
   phase: 'pre-draft' | 'draft' | 'season';
@@ -34,6 +34,28 @@ interface GameSnapshot {
   episodes: EpisodeData[];
   seasonEpisode: number;
   predictions: Prediction[];
+}
+
+export interface RemoteGameStatePayload {
+  chefs: Chef[];
+  currentEpisode: number;
+  phase: 'pre-draft' | 'draft' | 'season';
+  draftOrder: ('josh' | 'wife')[];
+  currentPick: number;
+  draftHistory: string[];
+  episodes: EpisodeData[];
+  seasonEpisode: number;
+  updatedAt: string;
+  updatedBy: string | null;
+}
+
+export interface RemotePredictionPayload {
+  episodeNumber: number;
+  player: 'josh' | 'wife';
+  chefId: string | null;
+  locked: boolean;
+  lockedAt: string | null;
+  correct: boolean | null;
 }
 
 interface GameState extends GameSnapshot {
@@ -69,9 +91,13 @@ interface GameState extends GameSnapshot {
 
   // Game management
   resetGame: () => void;
+
+  // Supabase sync
+  mergeRemoteState: (remote: RemoteGameStatePayload) => void;
+  mergeRemotePredictions: (remote: RemotePredictionPayload[]) => void;
 }
 
-function getSnapshot(state: GameState): GameSnapshot {
+export function getSnapshot(state: GameState): GameSnapshot {
   return {
     chefs: state.chefs,
     currentEpisode: state.currentEpisode,
@@ -309,6 +335,48 @@ export const useGameStore = create<GameState>()(
           _past: [...state._past, getSnapshot(state)],
           _future: state._future.slice(1),
         };
+      }),
+
+      mergeRemoteState: (remote) => set((state) => ({
+        chefs: remote.chefs,
+        currentEpisode: remote.currentEpisode,
+        phase: remote.phase,
+        draftOrder: remote.draftOrder,
+        currentPick: remote.currentPick,
+        draftHistory: remote.draftHistory,
+        episodes: remote.episodes,
+        seasonEpisode: remote.seasonEpisode,
+        // Preserve local predictions — they're synced separately
+        predictions: state.predictions,
+        // Don't push to undo history for remote merges
+        _past: state._past,
+        _future: state._future,
+      })),
+
+      mergeRemotePredictions: (remote) => set((state) => {
+        const updated = [...state.predictions];
+
+        for (const rp of remote) {
+          const idx = updated.findIndex(
+            (p) => p.episodeNumber === rp.episodeNumber && p.player === rp.player
+          );
+          const localPred: Prediction = {
+            episodeNumber: rp.episodeNumber,
+            player: rp.player,
+            chefId: rp.chefId,
+            locked: rp.locked,
+            lockedAt: rp.lockedAt,
+            correct: rp.correct,
+          };
+
+          if (idx >= 0) {
+            updated[idx] = localPred;
+          } else {
+            updated.push(localPred);
+          }
+        }
+
+        return { predictions: updated };
       }),
 
       resetGame: () => set({

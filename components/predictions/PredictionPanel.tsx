@@ -79,13 +79,16 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
 
   // Locked state
   if (isLocked && existingPrediction) {
-    const predChef = chefs.find((c) => c.id === existingPrediction.chefId);
+    const isHidden = existingPrediction.chefId === 'hidden';
+    const predChef = isHidden ? null : chefs.find((c) => c.id === existingPrediction.chefId);
     return (
       <div className="rounded-xl border border-gold/30 bg-gold/5 p-4">
         <p className={`text-[10px] font-bold uppercase tracking-[0.15em] ${colorClasses.text}`}>
           {playerLabel}&apos;s Prediction — Locked
         </p>
-        {existingPrediction.chefId ? (
+        {isHidden ? (
+          <p className="mt-2 text-sm font-medium text-warm-gray">Prediction sealed — lock yours to reveal</p>
+        ) : existingPrediction.chefId ? (
           <div className="mt-2 flex items-center gap-2">
             {predChef && (
               <div className="relative h-7 w-7 overflow-hidden rounded-full shadow-sm">
@@ -99,9 +102,11 @@ export default function PredictionPanel({ episodeNumber, player, onComplete }: P
         ) : (
           <p className="mt-1 text-sm text-warm-gray">Skipped</p>
         )}
-        <p className="mt-2 font-mono text-[10px] text-warm-gray">
-          Locked at {new Date(existingPrediction.lockedAt!).toLocaleString()}
-        </p>
+        {!isHidden && (
+          <p className="mt-2 font-mono text-[10px] text-warm-gray">
+            Locked at {new Date(existingPrediction.lockedAt!).toLocaleString()}
+          </p>
+        )}
       </div>
     );
   }

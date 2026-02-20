@@ -1,145 +1,91 @@
 'use client';
 
-import { useMemo } from 'react';
 import { useGameStore } from '@/lib/store/gameStore';
-import { calculatePoints } from '@/lib/data/scoring';
+import { useSeasonStats } from '@/lib/hooks/useSeasonStats';
 import CountUp from '@/components/ui/CountUp';
+import MomentumBar from '@/components/dashboard/MomentumBar';
+import TeamRoster from '@/components/dashboard/TeamRoster';
+import SeasonTimeline from '@/components/dashboard/SeasonTimeline';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const { chefs, episodes, predictions, seasonEpisode } = useGameStore();
+  const { seasonEpisode } = useGameStore();
+  const stats = useSeasonStats();
 
-  const stats = useMemo(() => {
-    let joshSeasonTotal = 0;
-    let jazzySeasonTotal = 0;
-    let joshWins = 0;
-    let jazzyWins = 0;
-
-    const episodeScores: {
-      episodeNumber: number;
-      joshScore: number;
-      jazzyScore: number;
-      joshCumulative: number;
-      jazzyCumulative: number;
-    }[] = [];
-
-    const chefTotalPoints: Record<string, { chefId: string; firstName: string; lastName: string; owner: string; imageUrl: string; totalPoints: number }> = {};
-
-    for (const chef of chefs) {
-      if (chef.owner !== 'undrafted') {
-        chefTotalPoints[chef.id] = {
-          chefId: chef.id,
-          firstName: chef.firstName,
-          lastName: chef.lastName,
-          owner: chef.owner,
-          imageUrl: chef.imageUrl,
-          totalPoints: 0,
-        };
-      }
-    }
-
-    const sortedEpisodes = [...episodes].sort(
-      (a, b) => a.episodeNumber - b.episodeNumber
-    );
-
-    for (const ep of sortedEpisodes) {
-      let joshEpScore = 0;
-      let jazzyEpScore = 0;
-      let wildcardScore = 0;
-
-      for (const result of ep.results) {
-        const chef = chefs.find((c) => c.id === result.chefId);
-        if (!chef) continue;
-
-        const pts = calculatePoints(result);
-        if (chefTotalPoints[chef.id]) {
-          chefTotalPoints[chef.id].totalPoints += pts;
-        }
-
-        if (chef.owner === 'josh') joshEpScore += pts;
-        else if (chef.owner === 'wife') jazzyEpScore += pts;
-        else if (chef.owner === 'wildcard') wildcardScore += pts;
-      }
-
-      const joshPred = predictions.find(
-        (p) => p.episodeNumber === ep.episodeNumber && p.player === 'josh'
-      );
-      const jazzyPred = predictions.find(
-        (p) => p.episodeNumber === ep.episodeNumber && p.player === 'wife'
-      );
-
-      if (joshPred?.correct === true) joshEpScore += 3;
-      else if (joshPred?.correct === false) joshEpScore -= 2;
-
-      if (jazzyPred?.correct === true) jazzyEpScore += 3;
-      else if (jazzyPred?.correct === false) jazzyEpScore -= 2;
-
-      if (joshEpScore <= jazzyEpScore) {
-        joshEpScore += wildcardScore;
-      } else {
-        jazzyEpScore += wildcardScore;
-      }
-
-      joshSeasonTotal += joshEpScore;
-      jazzySeasonTotal += jazzyEpScore;
-
-      if (joshEpScore > jazzyEpScore) joshWins++;
-      else if (jazzyEpScore > joshEpScore) jazzyWins++;
-
-      episodeScores.push({
-        episodeNumber: ep.episodeNumber,
-        joshScore: joshEpScore,
-        jazzyScore: jazzyEpScore,
-        joshCumulative: joshSeasonTotal,
-        jazzyCumulative: jazzySeasonTotal,
-      });
-    }
-
-    const topPerformers = Object.values(chefTotalPoints)
-      .sort((a, b) => b.totalPoints - a.totalPoints)
-      .slice(0, 10);
-
-    return {
-      joshSeasonTotal,
-      jazzySeasonTotal,
-      joshWins,
-      jazzyWins,
-      episodeScores,
-      topPerformers,
-    };
-  }, [chefs, episodes, predictions]);
+  // Compute team totals for roster cards (josh and wife totals including wildcard allocation)
+  // The season totals from the hook include prediction bonuses + wildcard allocation per episode,
+  // which is the right number for the hero. For roster cards we pass the season total.
+  const joshTeamChefs = stats.chefStats.filter((c) => c.owner === 'josh');
+  const jazzyTeamChefs = stats.chefStats.filter((c) => c.owner === 'wife');
+  const joshRosterTotal = joshTeamChefs.reduce((sum, c) => sum + c.totalPoints, 0);
+  const jazzyRosterTotal = jazzyTeamChefs.reduce((sum, c) => sum + c.totalPoints, 0);
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Dark Hero */}
+      {/* Dark Hero -- Rivalry Head-to-Head */}
       <div className="bg-ink px-4 py-12 text-center sm:py-16 md:py-20">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
           Season Dashboard
         </p>
         <h1 className="mt-3 font-display text-3xl font-bold text-white sm:mt-4 sm:text-5xl md:text-6xl">
-          The Scoreboard
+          The Rivalry
         </h1>
-        <p className="mt-2 text-sm text-white/30 sm:mt-3">
-          {episodes.length} episode{episodes.length !== 1 ? 's' : ''} scored
-        </p>
 
-        {/* Season Totals — solid colored backgrounds */}
-        <div className="mx-auto mt-8 grid max-w-md grid-cols-2 gap-3 sm:mt-12 sm:gap-4">
-          <div className="rounded-lg bg-josh p-4 sm:p-6">
+        {/* Season Totals -- bigger, bolder */}
+        <div className="mx-auto mt-8 grid max-w-lg grid-cols-2 gap-3 sm:mt-12 sm:gap-5">
+          <div className="rounded-xl bg-josh p-5 sm:p-7">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Josh</p>
-            <p className="mt-1 font-display text-3xl font-bold text-white sm:mt-2 sm:text-4xl md:text-5xl"><CountUp value={stats.joshSeasonTotal} /></p>
-            <p className="mt-1 font-mono text-[10px] text-white/40 sm:text-xs">{stats.joshWins} wins</p>
+            <p className="mt-1 font-display text-4xl font-bold text-white sm:mt-2 sm:text-5xl md:text-6xl">
+              <CountUp value={stats.joshSeasonTotal} />
+            </p>
+            <p className="mt-1 font-mono text-xs text-white/60">{stats.joshWins} win{stats.joshWins !== 1 ? 's' : ''}</p>
           </div>
-          <div className="rounded-lg bg-jazzy p-4 sm:p-6">
+          <div className="rounded-xl bg-jazzy p-5 sm:p-7">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Jazzy</p>
-            <p className="mt-1 font-display text-3xl font-bold text-white sm:mt-2 sm:text-4xl md:text-5xl"><CountUp value={stats.jazzySeasonTotal} /></p>
-            <p className="mt-1 font-mono text-[10px] text-white/40 sm:text-xs">{stats.jazzyWins} wins</p>
+            <p className="mt-1 font-display text-4xl font-bold text-white sm:mt-2 sm:text-5xl md:text-6xl">
+              <CountUp value={stats.jazzySeasonTotal} />
+            </p>
+            <p className="mt-1 font-mono text-xs text-white/60">{stats.jazzyWins} win{stats.jazzyWins !== 1 ? 's' : ''}</p>
           </div>
         </div>
+
+        {/* Momentum Bar */}
+        <div className="mx-auto mt-8 max-w-lg">
+          <MomentumBar joshTotal={stats.joshSeasonTotal} jazzyTotal={stats.jazzySeasonTotal} />
+        </div>
+
+        {/* Streak callout */}
+        {stats.currentStreak.player && stats.currentStreak.count >= 2 && (
+          <div className="mx-auto mt-4 inline-block rounded-full bg-white/10 px-4 py-1.5">
+            <p className="font-mono text-xs font-bold text-white/80">
+              {stats.currentStreak.player === 'josh' ? 'Josh' : 'Jazzy'}: {stats.currentStreak.count}-episode streak
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-10">
+        {/* Team Rosters */}
+        <div className="mb-8">
+          <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
+            Team Rosters
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <TeamRoster player="josh" chefStats={stats.chefStats} teamTotal={joshRosterTotal} />
+            <TeamRoster player="wife" chefStats={stats.chefStats} teamTotal={jazzyRosterTotal} />
+          </div>
+        </div>
+
+        {/* Season Timeline */}
+        <div className="mb-8">
+          <SeasonTimeline
+            episodeScores={stats.episodeScores}
+            chefStats={stats.chefStats}
+            currentSeasonEpisode={seasonEpisode}
+          />
+        </div>
+
         {/* Score Progression Chart */}
         {stats.episodeScores.length > 0 && (() => {
           const chartW = 600;
@@ -161,7 +107,7 @@ export default function DashboardPage() {
           const jazzyLine = stats.episodeScores.map((ep, i) => `${x(i)},${y(ep.jazzyCumulative)}`).join(' ');
 
           return (
-            <div className="mb-8 overflow-hidden rounded-lg bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+            <div className="mb-8 overflow-hidden rounded-xl bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">Score Progression</h2>
               <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full" preserveAspectRatio="xMidYMid meet">
                 {[0, 0.25, 0.5, 0.75, 1].map((frac) => {
@@ -199,7 +145,7 @@ export default function DashboardPage() {
         })()}
 
         {/* Top Performers */}
-        <div className="mb-8 overflow-hidden rounded-lg bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+        <div className="mb-8 overflow-hidden rounded-xl bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
           <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">Top Performers</h2>
           {stats.topPerformers.length === 0 ? (
             <p className="text-sm text-stone">No episodes scored yet</p>
@@ -225,8 +171,8 @@ export default function DashboardPage() {
                         perf.owner === 'josh'
                           ? 'text-josh'
                           : perf.owner === 'wife'
-                          ? 'text-jazzy'
-                          : 'text-gold'
+                            ? 'text-jazzy'
+                            : 'text-gold'
                       }`}
                     >
                       {perf.owner === 'josh' ? 'Josh' : perf.owner === 'wife' ? 'Jazzy' : 'WC'}
@@ -237,8 +183,8 @@ export default function DashboardPage() {
                       perf.totalPoints > 0
                         ? 'text-success'
                         : perf.totalPoints < 0
-                        ? 'text-danger'
-                        : 'text-warm-gray'
+                          ? 'text-danger'
+                          : 'text-warm-gray'
                     }`}
                   >
                     {perf.totalPoints > 0 ? '+' : ''}{perf.totalPoints}
@@ -249,74 +195,23 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Episode History — structured SmartConnect-style */}
-        <div className="mb-8">
-          <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">Episode History</h2>
-          {stats.episodeScores.length === 0 ? (
-            <div className="rounded-lg bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-              <p className="text-sm text-stone">No episodes scored yet</p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {stats.episodeScores.map((ep) => (
-                <Link
-                  key={ep.episodeNumber}
-                  href={`/episode/${ep.episodeNumber}`}
-                  className="group flex items-stretch overflow-hidden rounded-lg transition-all hover:shadow-md"
-                >
-                  {/* Episode number — dark block */}
-                  <div className="flex w-12 shrink-0 flex-col items-center justify-center bg-ink py-2.5 sm:w-16 sm:py-3">
-                    <span className="font-mono text-[8px] font-bold uppercase tracking-wider text-white/30 sm:text-[9px]">EP</span>
-                    <span className="font-display text-base font-bold text-white sm:text-xl">
-                      {String(ep.episodeNumber).padStart(2, '0')}
-                    </span>
-                  </div>
-
-                  {/* Scores */}
-                  <div className="flex min-w-0 flex-1 items-center justify-between bg-white px-3 py-2.5 sm:px-5 sm:py-3">
-                    <div className="flex items-center gap-3 sm:gap-5">
-                      <div className="text-center">
-                        <span className="block text-[8px] font-bold uppercase tracking-wider text-josh/50 sm:text-[9px]">Josh</span>
-                        <span className="font-mono text-xs font-bold text-josh sm:text-sm">
-                          {ep.joshScore > 0 ? '+' : ''}{ep.joshScore}
-                        </span>
-                      </div>
-                      <span className="text-[9px] text-stone-light sm:text-[10px]">vs</span>
-                      <div className="text-center">
-                        <span className="block text-[8px] font-bold uppercase tracking-wider text-jazzy/50 sm:text-[9px]">Jazzy</span>
-                        <span className="font-mono text-xs font-bold text-jazzy sm:text-sm">
-                          {ep.jazzyScore > 0 ? '+' : ''}{ep.jazzyScore}
-                        </span>
-                      </div>
-                    </div>
-                    <span className={`rounded-[3px] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white sm:px-2 sm:text-[9px] ${
-                      ep.joshScore > ep.jazzyScore ? 'bg-josh' : ep.jazzyScore > ep.joshScore ? 'bg-jazzy' : 'bg-warm-gray'
-                    }`}>
-                      {ep.joshScore > ep.jazzyScore ? 'Josh' : ep.jazzyScore > ep.joshScore ? 'Jazzy' : 'Tie'}
-                    </span>
-                  </div>
-
-                  {/* Right accent bar */}
-                  <div className={`w-1 shrink-0 ${
-                    ep.joshScore > ep.jazzyScore ? 'bg-josh' : ep.jazzyScore > ep.joshScore ? 'bg-jazzy' : 'bg-gold'
-                  }`} />
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
         {/* Quick Actions */}
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
+            href={`/live`}
+            className="w-full rounded-xl bg-ink px-6 py-2.5 text-center text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl sm:w-auto"
+          >
+            Episode Night Mode
+          </Link>
+          <Link
             href={`/episode/${seasonEpisode}`}
-            className="w-full rounded-lg bg-ink px-6 py-2.5 text-center text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl sm:w-auto"
+            className="w-full rounded-xl bg-white px-6 py-2.5 text-center text-sm font-bold uppercase tracking-wider text-charcoal shadow-md transition-all hover:shadow-lg sm:w-auto"
           >
             Score Episode {seasonEpisode}
           </Link>
           <Link
             href="/"
-            className="w-full rounded-lg bg-white px-6 py-2.5 text-center text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg sm:w-auto"
+            className="w-full rounded-xl bg-white px-6 py-2.5 text-center text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg sm:w-auto"
           >
             View All Chefs
           </Link>

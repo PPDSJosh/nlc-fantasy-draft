@@ -10,6 +10,7 @@ interface ScoringFormProps {
   episodeNumber: number;
   existingResults?: EpisodeResult[];
   onSave: (results: EpisodeResult[]) => void;
+  saveButtonText?: string;
 }
 
 export default function ScoringForm({
@@ -17,6 +18,7 @@ export default function ScoringForm({
   episodeNumber,
   existingResults,
   onSave,
+  saveButtonText,
 }: ScoringFormProps) {
   const [results, setResults] = useState<Record<string, EpisodeResult>>(() => {
     const initial: Record<string, EpisodeResult> = {};
@@ -155,7 +157,7 @@ export default function ScoringForm({
               : 'bg-ink text-white shadow-lg hover:bg-charcoal hover:shadow-xl'
           }`}
         >
-          Save Episode {episodeNumber}
+          {saveButtonText ?? `Save Episode ${episodeNumber}`}
         </button>
       </div>
     </div>

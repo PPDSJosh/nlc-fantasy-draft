@@ -1,17 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import gsap from 'gsap';
 import { useGameStore } from '@/lib/store/gameStore';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useSyncStatus } from '@/lib/hooks/useSyncStatus';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function Nav() {
   const pathname = usePathname();
   const { phase, resetGame, undo, redo, _past, _future } = useGameStore();
   const { user, logout } = useAuth();
+  const { connected, lastSyncedAt, opponentOnline } = useSyncStatus();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
+  const savedRef = useRef<HTMLSpanElement>(null);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const statusDotRef = useRef<HTMLSpanElement>(null);
+  const prevConnectedRef = useRef(false);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -27,6 +35,42 @@ export default function Nav() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
+
+  // Pulse animation when first connecting
+  useEffect(() => {
+    if (connected && !prevConnectedRef.current && statusDotRef.current) {
+      gsap.fromTo(
+        statusDotRef.current,
+        { scale: 1 },
+        { scale: 1.5, duration: 0.3, yoyo: true, repeat: 1, ease: 'power2.out' }
+      );
+    }
+    prevConnectedRef.current = connected;
+  }, [connected]);
+
+  // "Saved" indicator on lastSyncedAt change
+  useEffect(() => {
+    if (!lastSyncedAt) return;
+
+    setShowSaved(true);
+
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+
+    // Fade in
+    if (savedRef.current) {
+      gsap.fromTo(savedRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
+    }
+
+    savedTimerRef.current = setTimeout(() => {
+      if (savedRef.current) {
+        gsap.to(savedRef.current, {
+          opacity: 0,
+          duration: 0.3,
+          onComplete: () => setShowSaved(false),
+        });
+      }
+    }, 2000);
+  }, [lastSyncedAt]);
 
   // Don't show nav on login page
   if (pathname === '/login') return null;
@@ -45,11 +89,14 @@ export default function Nav() {
     { href: '/pre-draft', label: 'Pre-Draft' },
     { href: '/draft', label: 'Draft' },
     { href: '/dashboard', label: 'Dashboard' },
+    ...(phase === 'season' ? [{ href: '/live', label: 'Live' }] : []),
   ];
+
+  const opponentDisplayName = user?.player === 'josh' ? 'Jazzy' : 'Josh';
 
   return (
     <nav className="sticky top-0 z-40 border-b border-white/5 bg-ink/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between overflow-x-auto px-4 py-3">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-baseline gap-1">
             <span className="font-display text-xl font-bold text-white">NLC</span>
@@ -90,11 +137,32 @@ export default function Nav() {
             ↪
           </button>
           <span className="mx-1 h-4 w-px bg-white/10" />
+
+          {/* Sync status dot + "Saved" */}
+          <span className="flex items-center gap-1.5">
+            <span
+              ref={statusDotRef}
+              className={`inline-block h-1.5 w-1.5 rounded-full ${
+                connected ? 'bg-success' : 'bg-danger'
+              }`}
+              title={connected ? 'Connected' : 'Offline'}
+            />
+            {showSaved && (
+              <span
+                ref={savedRef}
+                className="font-mono text-[10px] text-white/60"
+                style={{ opacity: 0 }}
+              >
+                Saved
+              </span>
+            )}
+          </span>
+
           <span className="rounded-full bg-white/5 px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-widest text-white/30">
             {phase}
           </span>
 
-          {/* Current user indicator */}
+          {/* Current user indicator + opponent presence */}
           {user && (
             <>
               <span className="mx-1 h-4 w-px bg-white/10" />
@@ -102,6 +170,15 @@ export default function Nav() {
                 user.player === 'josh' ? 'bg-josh/80' : 'bg-jazzy/80'
               }`}>
                 {user.displayName}
+              </span>
+              <span className="flex items-center gap-1">
+                <span
+                  className={`inline-block h-1.5 w-1.5 rounded-full ${
+                    opponentOnline ? 'bg-success' : 'bg-white/20'
+                  }`}
+                  title={opponentOnline ? `${opponentDisplayName} is online` : `${opponentDisplayName} is offline`}
+                />
+                <span className="text-[10px] text-white/60">{opponentDisplayName}</span>
               </span>
               <button
                 onClick={logout}
@@ -122,7 +199,7 @@ export default function Nav() {
         </div>
       </div>
       {/* Mobile nav */}
-      <div className="flex items-center justify-center gap-0.5 border-t border-white/5 px-1 py-1.5 sm:hidden">
+      <div className="flex items-center justify-center gap-0.5 overflow-x-auto border-t border-white/5 px-1 py-1.5 sm:hidden">
         {links.map((link) => (
           <Link
             key={link.href}
