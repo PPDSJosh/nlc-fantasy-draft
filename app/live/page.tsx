@@ -207,14 +207,14 @@ export default function LivePage() {
         )}
 
         {/* Phase 2: Scoring Form */}
-        {bothLocked && !isAlreadyScored && (
+        {!isAlreadyScored && (
           <div ref={scoringRef} className="mb-8">
             <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
               Score Episode {currentEp}
             </h2>
 
-            {/* Show both predictions revealed */}
-            {(myPrediction || opponentPrediction) && (
+            {/* Show both predictions revealed if both locked */}
+            {bothLocked && (myPrediction || opponentPrediction) && (
               <div className="mb-6 flex flex-col gap-2">
                 <PredictionPanel
                   episodeNumber={currentEp}

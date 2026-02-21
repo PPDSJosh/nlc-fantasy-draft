@@ -150,33 +150,31 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
           </div>
         )}
 
-        {/* Scoring Form — once both predictions are locked */}
-        {bothPredictionsLocked && (
-          <>
-            {/* Show both predictions revealed */}
-            {(joshPrediction || jazzyPrediction) && (
-              <div className="mb-6 flex flex-col gap-2">
-                <PredictionPanel
-                  episodeNumber={episodeNumber}
-                  player="josh"
-                  onComplete={() => {}}
-                />
-                <PredictionPanel
-                  episodeNumber={episodeNumber}
-                  player="wife"
-                  onComplete={() => {}}
-                />
-              </div>
-            )}
+        {/* Scoring Form */}
+        <>
+          {/* Show both predictions revealed if both locked */}
+          {bothPredictionsLocked && (joshPrediction || jazzyPrediction) && (
+            <div className="mb-6 flex flex-col gap-2">
+              <PredictionPanel
+                episodeNumber={episodeNumber}
+                player="josh"
+                onComplete={() => {}}
+              />
+              <PredictionPanel
+                episodeNumber={episodeNumber}
+                player="wife"
+                onComplete={() => {}}
+              />
+            </div>
+          )}
 
-            <ScoringForm
-              activeChefs={activeChefs}
-              episodeNumber={episodeNumber}
-              existingResults={existingEpisode?.results}
-              onSave={handleSave}
-            />
-          </>
-        )}
+          <ScoringForm
+            activeChefs={activeChefs}
+            episodeNumber={episodeNumber}
+            existingResults={existingEpisode?.results}
+            onSave={handleSave}
+          />
+        </>
       </div>
     </div>
   );
