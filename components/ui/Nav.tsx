@@ -89,7 +89,10 @@ export default function Nav() {
     { href: '/pre-draft', label: 'Pre-Draft' },
     { href: '/draft', label: 'Draft' },
     { href: '/dashboard', label: 'Dashboard' },
-    ...(phase === 'season' ? [{ href: '/live', label: 'Live' }] : []),
+    ...(phase === 'season' ? [
+      { href: '/live', label: 'Live' },
+      { href: '/history', label: 'History' },
+    ] : []),
   ];
 
   const opponentDisplayName = user?.player === 'josh' ? 'Jazzy' : 'Josh';
