@@ -36,11 +36,7 @@ export default function DraftBoard() {
   const currentOwner = currentPick < 14 ? draftOrder[currentPick] : null;
   const roundNumber = currentPick < 14 ? currentPick + 1 : 14;
 
-  // Only the current owner can make a pick
-  const isMyTurn = user?.player === currentOwner;
-
   function handleDraft(chefId: string) {
-    if (!isMyTurn) return;
     draftChef(chefId);
   }
 
@@ -81,19 +77,10 @@ export default function DraftBoard() {
           <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
             Available Chefs ({availableChefs.length})
           </h2>
-          {!isMyTurn && (
-            <div className="mb-4 rounded-lg border border-gold/30 bg-gold/5 px-4 py-3 text-center">
-              <p className="text-sm font-medium text-warm-gray">
-                Waiting for <span className={currentOwner === 'josh' ? 'font-bold text-josh' : 'font-bold text-jazzy'}>
-                  {currentOwner === 'josh' ? "Josh" : "Jazzy"}
-                </span> to pick...
-              </p>
-            </div>
-          )}
           <AvailableChefs
             chefs={availableChefs}
             onDraft={handleDraft}
-            disabled={draftComplete || !isMyTurn}
+            disabled={draftComplete}
             getDropTarget={getDropTarget}
           />
         </div>
