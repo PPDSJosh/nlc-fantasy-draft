@@ -182,6 +182,12 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
         // Full replacement — Supabase is source of truth for predictions
         const filtered = predictions.map((p) => filterPredictionVisibility(p, user!.player));
         useGameStore.getState().replaceAllPredictions(filtered);
+
+        // Snapshot the post-hydration state so the write subscriber
+        // doesn't immediately write the hydrated state back
+        const hydratedState = useGameStore.getState();
+        prevSnapshotRef.current = getSnapshot(hydratedState);
+        prevPredictionsRef.current = JSON.stringify(hydratedState.predictions);
       } catch (err) {
         console.error('[sync] hydration failed:', err);
       }
@@ -193,10 +199,15 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
   }, [user]);
 
   // ── Write path: subscribe to Zustand changes ───────────────────
+  // CRITICAL: Only start writing AFTER initial hydration from Supabase.
+  // Otherwise stale localStorage data gets written back before the server
+  // state can replace it.
   useEffect(() => {
     if (!user) return;
 
     const unsub = useGameStore.subscribe((state) => {
+      // Gate: don't write until we've hydrated from Supabase
+      if (!hydratedRef.current) return;
       if (isSyncing()) return;
 
       const snapshot = getSnapshot(state);
