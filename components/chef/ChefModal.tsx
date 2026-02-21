@@ -130,7 +130,7 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
         </div>
 
         {/* Content side */}
-        <div className="flex flex-1 flex-col justify-center p-5 sm:p-8 md:p-10">
+        <div className="flex flex-1 flex-col p-5 sm:p-8 md:justify-center md:p-10">
           <h2 className="font-display text-3xl font-bold leading-none text-charcoal sm:text-4xl md:text-5xl">
             {chef.firstName}
           </h2>

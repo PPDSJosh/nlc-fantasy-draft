@@ -89,17 +89,17 @@ export default function Modal({ isOpen, onClose, children, size = 'default' }: M
     animateClose();
   }
 
-  const maxW = size === 'large' ? 'max-w-3xl' : 'max-w-lg';
+  const maxW = size === 'large' ? 'md:max-w-3xl' : 'md:max-w-lg';
 
   return (
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/95 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex overflow-y-auto bg-ink/95 backdrop-blur-md md:items-center md:justify-center md:p-4"
     >
       <div
         ref={contentRef}
-        className={`relative w-full ${maxW} overflow-hidden rounded-xl bg-cream shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}
+        className={`relative w-full min-h-screen bg-cream md:min-h-0 ${maxW} md:overflow-hidden md:rounded-xl md:shadow-[0_25px_60px_rgba(0,0,0,0.4)]`}
       >
         <button
           onClick={handleCloseClick}
