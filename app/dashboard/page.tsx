@@ -210,6 +210,12 @@ export default function DashboardPage() {
             Score Episode {seasonEpisode}
           </Link>
           <Link
+            href="/history"
+            className="w-full rounded-xl bg-white px-6 py-2.5 text-center text-sm font-bold uppercase tracking-wider text-charcoal shadow-md transition-all hover:shadow-lg sm:w-auto"
+          >
+            Episode History
+          </Link>
+          <Link
             href="/"
             className="w-full rounded-xl bg-white px-6 py-2.5 text-center text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg sm:w-auto"
           >
