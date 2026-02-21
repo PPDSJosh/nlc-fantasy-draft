@@ -45,9 +45,6 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
   const { user } = useAuth();
 
   const player = user?.player ?? 'josh';
-  const opponent: 'josh' | 'wife' = player === 'josh' ? 'wife' : 'josh';
-  const opponentLabel = player === 'josh' ? "Jazzy's Note" : "Josh's Note";
-
   const [noteText, setNoteText] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedRef = useRef('');
@@ -90,7 +87,6 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
 
   const isEliminated = chef.status === 'eliminated';
   const ownerInfo = OWNER_LABELS[chef.owner];
-  const opponentNote = chef.notes?.[opponent];
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="large">
@@ -218,16 +214,6 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
               rows={2}
               className="mt-3 w-full resize-none rounded-lg border border-stone-light bg-cream px-4 py-3 text-base text-charcoal placeholder-warm-gray/50 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
             />
-            {opponentNote && (
-              <div className="mt-3 rounded-lg bg-stone-light/30 px-4 py-3">
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-warm-gray">
-                  {opponentLabel}
-                </p>
-                <p className="mt-1.5 text-sm italic text-charcoal/70">
-                  {opponentNote}
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>
