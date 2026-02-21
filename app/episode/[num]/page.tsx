@@ -72,8 +72,14 @@ export default function EpisodePage({ params }: { params: Promise<{ num: string 
       .map((r) => r.chefId);
     resolvePredictions(episodeNumber, survivedChefIds);
 
+    const alreadyScored = episodes.some((e) => e.episodeNumber === episodeNumber && e.scored);
     saveEpisode(episodeNumber, results);
-    advanceSeasonEpisode();
+
+    // Only advance season episode on first-time scoring
+    if (!alreadyScored) {
+      advanceSeasonEpisode();
+    }
+
     router.push('/dashboard');
   }
 

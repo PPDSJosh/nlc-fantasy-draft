@@ -7,8 +7,18 @@ import { useRouter } from 'next/navigation';
 
 export default function PreDraftPage() {
   const router = useRouter();
-  const { chefs, currentEpisode, eliminateChef, restoreChef, advanceEpisode, startDraft } =
+  const { chefs, currentEpisode, phase, eliminateChef, restoreChef, advanceEpisode, startDraft } =
     useGameStore();
+
+  // Redirect if not in pre-draft
+  if (phase === 'draft') {
+    router.push('/draft');
+    return null;
+  }
+  if (phase === 'season') {
+    router.push('/dashboard');
+    return null;
+  }
 
   const eliminatedCount = chefs.filter((c) => c.status === 'eliminated').length;
   const remainingCount = chefs.length - eliminatedCount;
@@ -79,7 +89,11 @@ export default function PreDraftPage() {
             >
               Advance to Episode {currentEpisode + 1}
             </button>
-          ) : null}
+          ) : (
+            <p className="text-sm text-warm-gray">
+              Eliminate {9 - eliminatedCount} more chef{9 - eliminatedCount !== 1 ? 's' : ''} to start the draft
+            </p>
+          )}
         </div>
 
         <p className="mb-8 text-center text-xs text-warm-gray">

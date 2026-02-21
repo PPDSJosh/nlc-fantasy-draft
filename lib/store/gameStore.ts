@@ -267,6 +267,14 @@ export const useGameStore = create<GameState>()(
               eliminatedEpisode: episodeNumber,
             };
           }
+          // Un-eliminate chefs previously eliminated in this episode but no longer marked
+          if (chef.status === 'eliminated' && chef.eliminatedEpisode === episodeNumber) {
+            return {
+              ...chef,
+              status: 'active' as const,
+              eliminatedEpisode: null,
+            };
+          }
           return chef;
         });
 

@@ -103,14 +103,20 @@ export default function LivePage() {
         .filter((r) => r.survived && !r.eliminated)
         .map((r) => r.chefId);
 
+      const alreadyScored = episodes.some((e) => e.episodeNumber === currentEp && e.scored);
+
       resolvePredictions(currentEp, survivedChefIds);
       saveEpisode(currentEp, results);
-      advanceSeasonEpisode();
+
+      // Only advance season episode on first-time scoring
+      if (!alreadyScored) {
+        advanceSeasonEpisode();
+      }
 
       // Stay on page, show recap
       setScoredEpisode(currentEp);
     },
-    [currentEp, resolvePredictions, saveEpisode, advanceSeasonEpisode]
+    [currentEp, episodes, resolvePredictions, saveEpisode, advanceSeasonEpisode]
   );
 
   function handleNextEpisode() {
