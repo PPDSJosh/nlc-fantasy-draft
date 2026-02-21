@@ -10,11 +10,11 @@ import { useRouter } from 'next/navigation';
 
 export default function DraftBoard() {
   const router = useRouter();
-  const { chefs, currentPick, draftOrder, draftChef, undoLastPick, finalizeDraft } = useGameStore();
+  const { chefs, draftChef, undoLastPick, finalizeDraft } = useGameStore();
   const { user } = useAuth();
 
-  const joshDropRef = useRef<HTMLDivElement>(null);
-  const jazzyDropRef = useRef<HTMLDivElement>(null);
+  const myPlayer = user?.player ?? 'josh';
+  const myDropRef = useRef<HTMLDivElement>(null);
 
   const availableChefs = chefs.filter(
     (c) => c.owner === 'undrafted' && c.status === 'active'
@@ -24,20 +24,14 @@ export default function DraftBoard() {
   const jazzyChefs = chefs.filter((c) => c.owner === 'wife');
   const wildcardChef = chefs.find((c) => c.owner === 'wildcard');
 
-  const draftComplete = currentPick >= 14;
-
-  const joshPicks: number[] = [];
-  const jazzyPicks: number[] = [];
-  draftOrder.forEach((owner, i) => {
-    if (owner === 'josh') joshPicks.push(i);
-    else jazzyPicks.push(i);
-  });
-
-  const currentOwner = currentPick < 14 ? draftOrder[currentPick] : null;
-  const roundNumber = currentPick < 14 ? currentPick + 1 : 14;
+  const myChefs = myPlayer === 'josh' ? joshChefs : jazzyChefs;
+  const myTeamFull = myChefs.length >= 7;
+  const draftComplete = joshChefs.length >= 7 && jazzyChefs.length >= 7;
+  const totalPicked = joshChefs.length + jazzyChefs.length;
 
   function handleDraft(chefId: string) {
-    draftChef(chefId);
+    if (myTeamFull) return;
+    draftChef(chefId, myPlayer);
   }
 
   function handleFinalize() {
@@ -46,26 +40,28 @@ export default function DraftBoard() {
   }
 
   function getDropTarget(): HTMLDivElement | null {
-    if (!currentOwner) return null;
-    return currentOwner === 'josh' ? joshDropRef.current : jazzyDropRef.current;
+    return myDropRef.current;
   }
+
+  const slots = Array.from({ length: 7 }, (_, i) => i);
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Current Pick Indicator */}
+      {/* Status */}
       <div className="overflow-hidden rounded-lg bg-ink p-4 text-center sm:p-6">
         {draftComplete ? (
           <span className="font-display text-2xl font-bold text-white">Draft Complete</span>
         ) : (
           <div className="flex flex-col items-center gap-2">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
-              Round {roundNumber} of 14
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
+              {totalPicked} of 14 picked
             </span>
             <span className="font-display text-2xl font-bold text-white">
-              <span className={currentOwner === 'josh' ? 'text-josh' : 'text-jazzy'}>
-                {currentOwner === 'josh' ? "Josh's" : "Jazzy's"}
-              </span>
-              {' '}Pick
+              {myTeamFull ? (
+                <>Your team is full</>
+              ) : (
+                <>Pick your chefs <span className="text-white/60">({myChefs.length}/7)</span></>
+              )}
             </span>
           </div>
         )}
@@ -80,7 +76,7 @@ export default function DraftBoard() {
           <AvailableChefs
             chefs={availableChefs}
             onDraft={handleDraft}
-            disabled={draftComplete}
+            disabled={draftComplete || myTeamFull}
             getDropTarget={getDropTarget}
           />
         </div>
@@ -124,53 +120,57 @@ export default function DraftBoard() {
       {/* Team Columns */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Josh's Team */}
-        <div ref={joshDropRef} className="rounded-lg border border-josh/20 bg-white p-4 transition-colors">
+        <div
+          ref={myPlayer === 'josh' ? myDropRef : undefined}
+          className={`rounded-lg border bg-white p-4 transition-colors ${
+            myPlayer === 'josh' ? 'border-josh/40 ring-1 ring-josh/20' : 'border-josh/20'
+          }`}
+        >
           <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold text-josh">
             <span className="h-3 w-3 rounded-full bg-josh" />
             Josh&apos;s Team
             <span className="ml-auto font-mono text-sm text-warm-gray">{joshChefs.length}/7</span>
           </h2>
           <div className="flex flex-col gap-2">
-            {joshPicks.map((pickIndex, slotIndex) => {
-              const isActive = pickIndex === currentPick;
-              return (
-                <DraftSlot
-                  key={pickIndex}
-                  pickNumber={slotIndex + 1}
-                  chef={joshChefs[slotIndex] || null}
-                  isActive={isActive}
-                />
-              );
-            })}
+            {slots.map((i) => (
+              <DraftSlot
+                key={`josh-${i}`}
+                pickNumber={i + 1}
+                chef={joshChefs[i] || null}
+                isActive={false}
+              />
+            ))}
           </div>
         </div>
 
         {/* Jazzy's Team */}
-        <div ref={jazzyDropRef} className="rounded-lg border border-jazzy/20 bg-white p-4 transition-colors">
+        <div
+          ref={myPlayer === 'wife' ? myDropRef : undefined}
+          className={`rounded-lg border bg-white p-4 transition-colors ${
+            myPlayer === 'wife' ? 'border-jazzy/40 ring-1 ring-jazzy/20' : 'border-jazzy/20'
+          }`}
+        >
           <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold text-jazzy">
             <span className="h-3 w-3 rounded-full bg-jazzy" />
             Jazzy&apos;s Team
             <span className="ml-auto font-mono text-sm text-warm-gray">{jazzyChefs.length}/7</span>
           </h2>
           <div className="flex flex-col gap-2">
-            {jazzyPicks.map((pickIndex, slotIndex) => {
-              const isActive = pickIndex === currentPick;
-              return (
-                <DraftSlot
-                  key={pickIndex}
-                  pickNumber={slotIndex + 1}
-                  chef={jazzyChefs[slotIndex] || null}
-                  isActive={isActive}
-                />
-              );
-            })}
+            {slots.map((i) => (
+              <DraftSlot
+                key={`jazzy-${i}`}
+                pickNumber={i + 1}
+                chef={jazzyChefs[i] || null}
+                isActive={false}
+              />
+            ))}
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="flex justify-center gap-3">
-        {currentPick > 0 && !wildcardChef && (
+        {totalPicked > 0 && !wildcardChef && (
           <button
             onClick={undoLastPick}
             className="rounded-xl bg-cream-dark px-5 py-2.5 text-sm font-medium text-warm-gray transition-colors hover:bg-stone-light"

@@ -70,7 +70,7 @@ interface GameState extends GameSnapshot {
   startDraft: () => void;
 
   // Draft actions
-  draftChef: (chefId: string) => void;
+  draftChef: (chefId: string, owner: 'josh' | 'wife') => void;
   undoLastPick: () => void;
   finalizeDraft: () => void;
 
@@ -168,9 +168,9 @@ export const useGameStore = create<GameState>()(
         phase: 'draft',
       })),
 
-      draftChef: (chefId) => set((state) => {
-        if (state.currentPick >= 14) return state;
-        const owner = state.draftOrder[state.currentPick];
+      draftChef: (chefId, owner) => set((state) => {
+        const teamCount = state.chefs.filter((c) => c.owner === owner).length;
+        if (teamCount >= 7) return state;
         return {
           ...pushHistory(state),
           chefs: state.chefs.map((chef) =>
