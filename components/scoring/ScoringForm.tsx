@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Chef } from '@/lib/data/chefs';
 import { EpisodeResult, calculatePoints, validateResult } from '@/lib/data/scoring';
 import ChefScoringRow from './ChefScoringRow';
@@ -10,7 +10,6 @@ interface ScoringFormProps {
   episodeNumber: number;
   existingResults?: EpisodeResult[];
   onSave: (results: EpisodeResult[]) => void;
-  saveButtonText?: string;
 }
 
 export default function ScoringForm({
@@ -18,7 +17,6 @@ export default function ScoringForm({
   episodeNumber,
   existingResults,
   onSave,
-  saveButtonText,
 }: ScoringFormProps) {
   const [results, setResults] = useState<Record<string, EpisodeResult>>(() => {
     const initial: Record<string, EpisodeResult> = {};
@@ -36,9 +34,22 @@ export default function ScoringForm({
     return initial;
   });
 
-  function handleChange(chefId: string, result: EpisodeResult) {
-    setResults((prev) => ({ ...prev, [chefId]: result }));
-  }
+  // Auto-save: fire onSave on every checkbox change
+  const onSaveRef = useRef(onSave);
+  useEffect(() => { onSaveRef.current = onSave; }, [onSave]);
+
+  const handleChange = useCallback((chefId: string, result: EpisodeResult) => {
+    setResults((prev) => {
+      const updated = { ...prev, [chefId]: result };
+      // Fire auto-save with the full updated results
+      const allUpdated = Object.values(updated);
+      const hasValidationErrors = allUpdated.some((r) => validateResult(r).length > 0);
+      if (!hasValidationErrors) {
+        onSaveRef.current(allUpdated);
+      }
+      return updated;
+    });
+  }, []);
 
   const allResults = Object.values(results);
   const hasErrors = allResults.some((r) => validateResult(r).length > 0);
@@ -65,10 +76,6 @@ export default function ScoringForm({
 
     return { joshTotal, jazzyTotal, wildcardTotal };
   }, [results, activeChefs]);
-
-  function handleSave() {
-    onSave(allResults);
-  }
 
   const joshChefs = activeChefs.filter((c) => c.owner === 'josh');
   const jazzyChefs = activeChefs.filter((c) => c.owner === 'wife');
@@ -146,20 +153,10 @@ export default function ScoringForm({
         </div>
       )}
 
-      {/* Save Button */}
-      <div className="flex justify-center">
-        <button
-          onClick={handleSave}
-          disabled={hasErrors}
-          className={`rounded-xl px-8 py-3 text-sm font-bold uppercase tracking-wider transition-all ${
-            hasErrors
-              ? 'cursor-not-allowed bg-stone-light text-warm-gray'
-              : 'bg-ink text-white shadow-lg hover:bg-charcoal hover:shadow-xl'
-          }`}
-        >
-          {saveButtonText ?? `Save Episode ${episodeNumber}`}
-        </button>
-      </div>
+      {/* Auto-save indicator */}
+      {hasErrors && (
+        <p className="text-center text-sm text-danger">Fix validation errors above to save.</p>
+      )}
     </div>
   );
 }

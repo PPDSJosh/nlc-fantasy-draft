@@ -24,12 +24,12 @@ export default function LivePage() {
     advanceSeasonEpisode,
   } = useGameStore();
 
-  const [scoredEpisode, setScoredEpisode] = useState<number | null>(null);
-  const scoringRef = useRef<HTMLDivElement>(null);
+  // null = actively scoring, number = finished that episode (show recap)
+  const [finishedEpisode, setFinishedEpisode] = useState<number | null>(null);
   const recapRef = useRef<HTMLDivElement>(null);
 
   // Current episode to work with
-  const currentEp = scoredEpisode ?? seasonEpisode;
+  const currentEp = finishedEpisode ?? seasonEpisode;
 
   // Guard: redirect if not in season
   useEffect(() => {
@@ -51,7 +51,6 @@ export default function LivePage() {
 
   // Episode data
   const existingEpisode = episodes.find((e) => e.episodeNumber === currentEp);
-  const isAlreadyScored = !!existingEpisode?.scored || scoredEpisode !== null;
 
   // Predictions
   const myPrediction = predictions.find(
@@ -63,10 +62,9 @@ export default function LivePage() {
 
   const myPredictionLocked = myPrediction?.locked || false;
   const opponentPredictionLocked = opponentPrediction?.locked || false;
-  const bothLocked =
-    (myPredictionLocked && opponentPredictionLocked) || isAlreadyScored;
+  const bothLocked = myPredictionLocked && opponentPredictionLocked;
 
-  // Active chefs for scoring (same filter as episode page)
+  // Active chefs for scoring
   const activeChefs = chefs
     .filter(
       (c) =>
@@ -76,53 +74,44 @@ export default function LivePage() {
     .filter((c) => !c.eliminatedPreDraft)
     .filter((c) => c.owner !== 'undrafted');
 
-  // Auto-scroll to scoring form when both predictions lock
-  const prevBothLockedRef = useRef(bothLocked);
+  // Auto-scroll to recap after finishing
   useEffect(() => {
-    if (bothLocked && !prevBothLockedRef.current && scoringRef.current && !isAlreadyScored) {
-      setTimeout(() => {
-        scoringRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
-    }
-    prevBothLockedRef.current = bothLocked;
-  }, [bothLocked, isAlreadyScored]);
-
-  // Auto-scroll to recap after scoring
-  useEffect(() => {
-    if (scoredEpisode !== null && recapRef.current) {
+    if (finishedEpisode !== null && recapRef.current) {
       setTimeout(() => {
         recapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 300);
     }
-  }, [scoredEpisode]);
+  }, [finishedEpisode]);
 
+  // Auto-save: just persist results, no episode advancement
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleSave = useCallback(
+  const handleAutoSave = useCallback(
     (results: EpisodeResult[]) => {
       const survivedChefIds = results
         .filter((r) => r.survived && !r.eliminated)
         .map((r) => r.chefId);
 
-      const alreadyScored = episodes.some((e) => e.episodeNumber === currentEp && e.scored);
-
       resolvePredictions(currentEp, survivedChefIds);
       saveEpisode(currentEp, results);
-
-      // Only advance season episode on first-time scoring
-      if (!alreadyScored) {
-        advanceSeasonEpisode();
-      }
-
-      // Stay on page, show recap
-      setScoredEpisode(currentEp);
     },
-    [currentEp, episodes, resolvePredictions, saveEpisode, advanceSeasonEpisode]
+    [currentEp, resolvePredictions, saveEpisode]
   );
 
+  // Explicit action: finish this episode and advance
+  function handleFinishEpisode() {
+    // Only advance if we haven't already (idempotent)
+    if (currentEp === seasonEpisode) {
+      advanceSeasonEpisode();
+    }
+    setFinishedEpisode(currentEp);
+  }
+
   function handleNextEpisode() {
-    setScoredEpisode(null);
+    setFinishedEpisode(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  const isShowingRecap = finishedEpisode !== null;
 
   return (
     <div className="min-h-screen bg-cream">
@@ -135,16 +124,16 @@ export default function LivePage() {
           Episode {currentEp}
         </h1>
         <p className="mt-2 text-sm text-white/60 sm:mt-3">
-          {isAlreadyScored ? 'Results' : 'Live Mode'}
+          {isShowingRecap ? 'Results' : 'Live Mode'}
         </p>
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-10">
-        {/* Phase 1: Predictions */}
-        {!isAlreadyScored && (
+        {/* Predictions — collapsible, only show before finish */}
+        {!isShowingRecap && (
           <div className="mb-8">
             <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
-              Predictions
+              Predictions (Optional)
             </h2>
             <p className="mb-4 text-sm text-warm-gray">
               Predict which of your chefs will survive. +3 if correct, -2 if wrong, 0 if skipped.
@@ -206,9 +195,9 @@ export default function LivePage() {
           </div>
         )}
 
-        {/* Phase 2: Scoring Form */}
-        {!isAlreadyScored && (
-          <div ref={scoringRef} className="mb-8">
+        {/* Scoring Form — always visible when not showing recap */}
+        {!isShowingRecap && (
+          <div className="mb-8">
             <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
               Score Episode {currentEp}
             </h2>
@@ -233,33 +222,40 @@ export default function LivePage() {
               activeChefs={activeChefs}
               episodeNumber={currentEp}
               existingResults={existingEpisode?.results}
-              onSave={handleSave}
-              saveButtonText="Save & See Results"
+              onSave={handleAutoSave}
             />
+
+            {/* Finish Episode button */}
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={handleFinishEpisode}
+                className="rounded-xl bg-ink px-8 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl"
+              >
+                Finish Episode {currentEp}
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Phase 3: Episode Recap */}
-        {isAlreadyScored && (
+        {/* Recap — shown after clicking Finish Episode */}
+        {isShowingRecap && (
           <div ref={recapRef} className="mb-8">
             <h2 className="mb-4 text-[10px] font-bold uppercase tracking-[0.15em] text-warm-gray">
-              Episode {scoredEpisode ?? currentEp} Recap
+              Episode {finishedEpisode} Recap
             </h2>
-            <EpisodeRecap episodeNumber={scoredEpisode ?? currentEp} />
+            <EpisodeRecap episodeNumber={finishedEpisode!} />
           </div>
         )}
 
-        {/* Phase 4: Next Episode CTA */}
-        {isAlreadyScored && (
+        {/* Post-recap actions */}
+        {isShowingRecap && (
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            {scoredEpisode !== null && (
-              <button
-                onClick={handleNextEpisode}
-                className="w-full rounded-xl bg-ink px-6 py-3 text-center text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl sm:w-auto"
-              >
-                Ready for Episode {seasonEpisode}
-              </button>
-            )}
+            <button
+              onClick={handleNextEpisode}
+              className="w-full rounded-xl bg-ink px-6 py-3 text-center text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl sm:w-auto"
+            >
+              Ready for Episode {seasonEpisode}
+            </button>
             <Link
               href="/dashboard"
               className="w-full rounded-xl bg-white px-6 py-2.5 text-center text-sm font-medium text-charcoal shadow-md transition-all hover:shadow-lg sm:w-auto"
