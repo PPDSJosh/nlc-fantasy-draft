@@ -358,7 +358,7 @@ export const useGameStore = create<GameState>()(
         chefs: remote.chefs,
         currentEpisode: remote.currentEpisode,
         phase: remote.phase,
-        draftOrder: remote.draftOrder,
+        draftOrder: remote.draftOrder.length > 0 ? remote.draftOrder : state.draftOrder,
         currentPick: remote.currentPick,
         draftHistory: remote.draftHistory,
         episodes: remote.episodes,
