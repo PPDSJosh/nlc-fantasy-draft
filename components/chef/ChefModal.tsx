@@ -1,8 +1,11 @@
 'use client';
 
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Chef } from '@/lib/data/chefs';
 import { useGameStore } from '@/lib/store/gameStore';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { toast } from '@/components/ui/Toast';
 import Modal from '@/components/ui/Modal';
 
 const TYPE_BG: Record<Chef['type'], string> = {
@@ -38,11 +41,56 @@ interface ChefModalProps {
 
 export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
   const toggleChefStatus = useGameStore((s) => s.toggleChefStatus);
+  const setChefNote = useGameStore((s) => s.setChefNote);
+  const { user } = useAuth();
+
+  const player = user?.player ?? 'josh';
+  const opponent: 'josh' | 'wife' = player === 'josh' ? 'wife' : 'josh';
+  const opponentLabel = player === 'josh' ? "Jazzy's Note" : "Josh's Note";
+
+  const [noteText, setNoteText] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedRef = useRef('');
+
+  // Sync noteText when chef changes or modal opens
+  useEffect(() => {
+    const val = chef?.notes?.[player] ?? '';
+    setNoteText(val);
+    lastSavedRef.current = val;
+  }, [chef?.id, player, isOpen]);
+
+  const saveNote = useCallback((text: string) => {
+    if (!chef) return;
+    if (text === lastSavedRef.current) return;
+    setChefNote(chef.id, player, text);
+    lastSavedRef.current = text;
+    toast({ title: 'Note saved', variant: 'success', duration: 2000 });
+  }, [chef, player, setChefNote]);
+
+  const handleNoteChange = useCallback((value: string) => {
+    setNoteText(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => saveNote(value), 500);
+  }, [saveNote]);
+
+  const handleBlur = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    saveNote(noteText);
+  }, [noteText, saveNote]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      saveNote(noteText);
+    }
+  }, [noteText, saveNote]);
 
   if (!chef) return null;
 
   const isEliminated = chef.status === 'eliminated';
   const ownerInfo = OWNER_LABELS[chef.owner];
+  const opponentNote = chef.notes?.[opponent];
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="large">
@@ -153,6 +201,33 @@ export default function ChefModal({ chef, isOpen, onClose }: ChefModalProps) {
                 </span>
               </button>
             </div>
+          </div>
+
+          {/* Notes section */}
+          <div className="mt-6 h-px w-full bg-stone-light/50" />
+          <div className="mt-5 sm:mt-6">
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-warm-gray">
+              Notes
+            </p>
+            <textarea
+              value={noteText}
+              onChange={(e) => handleNoteChange(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              placeholder="Add a note..."
+              rows={2}
+              className="mt-3 w-full resize-none rounded-lg border border-stone-light bg-cream px-4 py-3 text-base text-charcoal placeholder-warm-gray/50 focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold"
+            />
+            {opponentNote && (
+              <div className="mt-3 rounded-lg bg-stone-light/30 px-4 py-3">
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-warm-gray">
+                  {opponentLabel}
+                </p>
+                <p className="mt-1.5 text-sm italic text-charcoal/70">
+                  {opponentNote}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

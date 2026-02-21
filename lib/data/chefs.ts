@@ -10,6 +10,7 @@ export interface Chef {
   eliminatedEpisode: number | null;
   eliminatedPreDraft: boolean;
   owner: 'josh' | 'wife' | 'wildcard' | 'undrafted';
+  notes: { josh?: string; wife?: string };
 }
 
 export const CHEFS: Chef[] = [
@@ -26,6 +27,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'kevin',
@@ -39,6 +41,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'hunter',
@@ -52,6 +55,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'gabrielle',
@@ -65,6 +69,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'darian',
@@ -78,6 +83,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'connor',
@@ -91,6 +97,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'cole',
@@ -104,6 +111,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'belinda',
@@ -117,6 +125,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
 
   // SOCIAL MEDIA CHEFS (8)
@@ -132,6 +141,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'miriam',
@@ -145,6 +155,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'matt',
@@ -158,6 +169,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'mareya',
@@ -171,6 +183,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'landon',
@@ -184,6 +197,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'henna',
@@ -197,6 +211,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'christian',
@@ -210,6 +225,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'andy',
@@ -223,6 +239,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
 
   // HOME CHEFS (8)
@@ -238,6 +255,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'jared',
@@ -251,6 +269,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'emerson',
@@ -264,6 +283,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'elise',
@@ -277,6 +297,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'earl',
@@ -290,6 +311,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'diana',
@@ -303,6 +325,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'danielle',
@@ -316,6 +339,7 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
   {
     id: 'amber',
@@ -329,5 +353,6 @@ export const CHEFS: Chef[] = [
     eliminatedEpisode: null,
     eliminatedPreDraft: false,
     owner: 'undrafted',
+    notes: {},
   },
 ];
