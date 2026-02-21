@@ -17,8 +17,8 @@ export default function PreDraftPage() {
     (c) => c.eliminatedEpisode === currentEpisode
   ).length;
 
-  const canAdvance = currentEpisode < 3 && eliminatedThisEpisode >= 3;
-  const canStartDraft = eliminatedCount === 9 && currentEpisode >= 3;
+  const canAdvance = currentEpisode < 3 && eliminatedThisEpisode >= 3 && eliminatedCount < 9;
+  const canStartDraft = eliminatedCount === 9;
 
   function handleChefClick(chef: Chef) {
     if (chef.status === 'eliminated') {
@@ -60,7 +60,14 @@ export default function PreDraftPage() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         {/* Actions */}
         <div className="mb-8 flex justify-center gap-3">
-          {currentEpisode < 3 && (
+          {canStartDraft ? (
+            <button
+              onClick={handleStartDraft}
+              className="rounded-xl bg-ink px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:bg-charcoal hover:shadow-xl"
+            >
+              Start Draft
+            </button>
+          ) : currentEpisode < 3 ? (
             <button
               onClick={advanceEpisode}
               disabled={!canAdvance}
@@ -72,20 +79,7 @@ export default function PreDraftPage() {
             >
               Advance to Episode {currentEpisode + 1}
             </button>
-          )}
-          {currentEpisode >= 3 && (
-            <button
-              onClick={handleStartDraft}
-              disabled={!canStartDraft}
-              className={`rounded-xl px-6 py-2.5 text-sm font-bold uppercase tracking-wider transition-all ${
-                canStartDraft
-                  ? 'bg-ink text-white shadow-lg hover:bg-charcoal hover:shadow-xl'
-                  : 'cursor-not-allowed bg-stone-light/50 text-warm-gray'
-              }`}
-            >
-              Start Draft
-            </button>
-          )}
+          ) : null}
         </div>
 
         <p className="mb-8 text-center text-xs text-warm-gray">
