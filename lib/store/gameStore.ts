@@ -364,7 +364,8 @@ export const useGameStore = create<GameState>()(
       }),
 
       mergeRemoteState: (remote) => set((state) => ({
-        chefs: remote.chefs,
+        // Ensure all chefs have notes field (may be missing from older Supabase data)
+        chefs: remote.chefs.map((c) => ({ ...c, notes: c.notes ?? {} })),
         currentEpisode: remote.currentEpisode,
         phase: remote.phase,
         draftOrder: remote.draftOrder.length > 0 ? remote.draftOrder : state.draftOrder,
