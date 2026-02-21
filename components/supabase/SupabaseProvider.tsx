@@ -145,18 +145,18 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
   const prevRemoteStateRef = useRef<RemoteGameStatePayload | null>(null);
   const hiddenAtRef = useRef<number | null>(null);
 
-  // Stable reference to fetchAndMerge for visibility change handler
-  const fetchAndMerge = useCallback(async () => {
+  // Stable reference to fetchAndReplace for visibility change handler
+  // Uses full replacement so Supabase is always the source of truth
+  const fetchAndReplace = useCallback(async () => {
     if (!user) return;
     try {
       const { gameState, predictions } = await fetchInitialState();
       if (gameState) {
         useGameStore.getState().mergeRemoteState(gameState);
       }
-      if (predictions.length > 0) {
-        const filtered = predictions.map((p) => filterPredictionVisibility(p, user.player));
-        useGameStore.getState().mergeRemotePredictions(filtered);
-      }
+      // Full replacement — wipe any stale local predictions
+      const filtered = predictions.map((p) => filterPredictionVisibility(p, user.player));
+      useGameStore.getState().replaceAllPredictions(filtered);
     } catch (err) {
       console.error('[sync] refetch failed:', err);
     }
@@ -179,10 +179,9 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
           writeGameState(snapshot, user!.player);
         }
 
-        if (predictions.length > 0) {
-          const filtered = predictions.map((p) => filterPredictionVisibility(p, user!.player));
-          useGameStore.getState().mergeRemotePredictions(filtered);
-        }
+        // Full replacement — Supabase is source of truth for predictions
+        const filtered = predictions.map((p) => filterPredictionVisibility(p, user!.player));
+        useGameStore.getState().replaceAllPredictions(filtered);
       } catch (err) {
         console.error('[sync] hydration failed:', err);
       }
@@ -354,13 +353,13 @@ export default function SupabaseProvider({ children }: { children: React.ReactNo
         // Skip if hidden for less than 5 seconds
         if (hiddenFor < 5000) return;
 
-        fetchAndMerge();
+        fetchAndReplace();
       }
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [user, fetchAndMerge]);
+  }, [user, fetchAndReplace]);
 
   return <>{children}</>;
 }

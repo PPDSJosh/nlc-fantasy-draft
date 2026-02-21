@@ -98,6 +98,7 @@ interface GameState extends GameSnapshot {
   // Supabase sync
   mergeRemoteState: (remote: RemoteGameStatePayload) => void;
   mergeRemotePredictions: (remote: RemotePredictionPayload[]) => void;
+  replaceAllPredictions: (remote: RemotePredictionPayload[]) => void;
 }
 
 export function getSnapshot(state: GameState): GameSnapshot {
@@ -402,6 +403,18 @@ export const useGameStore = create<GameState>()(
         }
 
         return { predictions: updated };
+      }),
+
+      // Full replacement — used during initial hydration so Supabase is the source of truth
+      replaceAllPredictions: (remote) => set({
+        predictions: remote.map((rp) => ({
+          episodeNumber: rp.episodeNumber,
+          player: rp.player,
+          chefId: rp.chefId,
+          locked: rp.locked,
+          lockedAt: rp.lockedAt,
+          correct: rp.correct,
+        })),
       }),
 
       resetGame: () => set({
