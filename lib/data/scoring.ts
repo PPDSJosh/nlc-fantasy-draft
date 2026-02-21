@@ -31,9 +31,6 @@ export function validateResult(result: EpisodeResult): string[] {
   if (result.wonChallenge && result.bottom3) {
     errors.push('Cannot win challenge and be in bottom 3');
   }
-  if (result.wonChallenge && !result.survived && !result.eliminated) {
-    errors.push('Challenge winner must have survived');
-  }
 
   return errors;
 }

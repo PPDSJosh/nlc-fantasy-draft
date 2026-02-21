@@ -32,7 +32,6 @@ export default function ChefScoringRow({ chef, result, onChange }: ChefScoringRo
       updated.eliminated = false;
     }
     if (field === 'wonChallenge' && checked) {
-      updated.survived = true;
       updated.bottom3 = false;
     }
     if (field === 'bottom3' && checked) {
